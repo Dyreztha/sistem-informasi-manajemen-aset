@@ -28,6 +28,18 @@ class Asset extends Model
         'depreciation_value' => 'decimal:2',
     ];
     
+    // Status constants
+    const STATUS_TERSEDIA = 'tersedia';
+    const STATUS_DIGUNAKAN = 'digunakan';
+    const STATUS_MAINTENANCE = 'maintenance';
+    const STATUS_DISPOSAL = 'disposal';
+    
+    // Condition constants
+    const CONDITION_BAIK = 'baik';
+    const CONDITION_RUSAK_RINGAN = 'rusak_ringan';
+    const CONDITION_RUSAK_BERAT = 'rusak_berat';
+    const CONDITION_HILANG = 'hilang';
+    
     // Auto-generate code
     protected static function boot()
     {
@@ -36,7 +48,7 @@ class Asset extends Model
         static::creating(function ($asset) {
             if (!$asset->code) {
                 $year = date('Y');
-                $lastAsset = static::whereYear('created_at', $year)->latest('id')->first();
+                $lastAsset = static::withTrashed()->whereYear('created_at', $year)->latest('id')->first();
                 $number = $lastAsset ? intval(substr($lastAsset->code, -3)) + 1 : 1;
                 $asset->code = 'AST-' . $year . '-' . str_pad($number, 3, '0', STR_PAD_LEFT);
             }
@@ -44,6 +56,25 @@ class Asset extends Model
             // Generate QR Code
             if (!$asset->qr_code) {
                 $asset->qr_code = $asset->code;
+            }
+            
+            // Set initial current_value to purchase_price
+            if (!$asset->current_value) {
+                $asset->current_value = $asset->purchase_price;
+            }
+        });
+        
+        static::created(function ($asset) {
+            // Calculate depreciation after creation
+            $asset->updateCurrentValue();
+        });
+        
+        static::updating(function ($asset) {
+            // Recalculate if purchase_price or purchase_date or category changed
+            if ($asset->isDirty(['purchase_price', 'purchase_date', 'category_id'])) {
+                $depreciation = $asset->calculateDepreciation();
+                $asset->depreciation_value = $depreciation;
+                $asset->current_value = max(0, $asset->purchase_price - $depreciation);
             }
         });
     }
@@ -96,22 +127,49 @@ class Asset extends Model
             return 0;
         }
         
-        $yearsOwned = now()->diffInYears($this->purchase_date);
+        // Calculate years owned (fractional)
+        $yearsOwned = $this->purchase_date->diffInMonths(now()) / 12;
+        
+        if ($yearsOwned <= 0) {
+            return 0;
+        }
+        
+        $depreciationRate = $this->category->depreciation_rate ?? 0;
+        
+        if ($depreciationRate <= 0) {
+            return 0;
+        }
         
         if ($this->category->depreciation_method === 'straight_line') {
-            $annualDepreciation = ($this->purchase_price * $this->category->depreciation_rate) / 100;
+            // Straight Line: (Purchase Price × Rate%) × Years
+            $annualDepreciation = ($this->purchase_price * $depreciationRate) / 100;
             $totalDepreciation = $annualDepreciation * $yearsOwned;
-        } else { // double_declining
-            $rate = ($this->category->depreciation_rate / 100) * 2;
+        } else { 
+            // Double Declining Balance
+            $rate = ($depreciationRate / 100) * 2;
             $currentValue = $this->purchase_price;
+            $fullYears = floor($yearsOwned);
+            $partialYear = $yearsOwned - $fullYears;
             
-            for ($i = 0; $i < $yearsOwned; $i++) {
+            // Full years depreciation
+            for ($i = 0; $i < $fullYears; $i++) {
                 $currentValue -= ($currentValue * $rate);
+                if ($currentValue < 0) {
+                    $currentValue = 0;
+                    break;
+                }
             }
             
+            // Partial year depreciation
+            if ($partialYear > 0 && $currentValue > 0) {
+                $currentValue -= ($currentValue * $rate * $partialYear);
+            }
+            
+            $currentValue = max(0, $currentValue);
             $totalDepreciation = $this->purchase_price - $currentValue;
         }
         
+        // Depreciation cannot exceed purchase price
         return min($totalDepreciation, $this->purchase_price);
     }
     
@@ -119,7 +177,84 @@ class Asset extends Model
     {
         $this->depreciation_value = $this->calculateDepreciation();
         $this->current_value = max(0, $this->purchase_price - $this->depreciation_value);
-        $this->save();
+        $this->saveQuietly(); // Save without triggering events
+    }
+    
+    /**
+     * Check if asset is available for borrowing/movement
+     */
+    public function isAvailable(): bool
+    {
+        return $this->status === self::STATUS_TERSEDIA 
+            && $this->condition !== self::CONDITION_HILANG;
+    }
+    
+    /**
+     * Check if asset is currently being used/borrowed
+     */
+    public function isInUse(): bool
+    {
+        return $this->status === self::STATUS_DIGUNAKAN;
+    }
+    
+    /**
+     * Check if asset is under maintenance
+     */
+    public function isUnderMaintenance(): bool
+    {
+        return $this->status === self::STATUS_MAINTENANCE;
+    }
+    
+    /**
+     * Check if asset has active maintenance ticket (pending or in_progress)
+     */
+    public function hasActiveMaintenance(): bool
+    {
+        return $this->maintenances()
+            ->whereIn('status', ['pending', 'in_progress'])
+            ->exists();
+    }
+    
+    /**
+     * Check if asset has active movement/loan (pending or active)
+     */
+    public function hasActiveMovement(): bool
+    {
+        return $this->movements()
+            ->where(function ($query) {
+                $query->where('status', 'pending')
+                    ->orWhere(function ($q) {
+                        $q->where('status', 'approved')
+                          ->where('type', 'peminjaman')
+                          ->whereNull('actual_return_date');
+                    });
+            })
+            ->exists();
+    }
+    
+    /**
+     * Get reason why asset is not available
+     */
+    public function getUnavailabilityReason(): ?string
+    {
+        if ($this->condition === self::CONDITION_HILANG) {
+            return 'Aset tercatat hilang';
+        }
+        
+        if ($this->status === self::STATUS_MAINTENANCE) {
+            return 'Aset sedang dalam pemeliharaan';
+        }
+        
+        if ($this->status === self::STATUS_DIGUNAKAN) {
+            $user = $this->assignedUser ? $this->assignedUser->name : 'seseorang';
+            return "Aset sedang digunakan oleh {$user}";
+        }
+        
+        if ($this->status === self::STATUS_DISPOSAL) {
+            return 'Aset sudah dihapuskan/disposal';
+        }
+        
+        return null;
     }
     
     public function getQrCodeImageAttribute()

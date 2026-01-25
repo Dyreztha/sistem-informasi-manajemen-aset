@@ -10,6 +10,7 @@ use App\Models\Location;
 use App\Models\Vendor;
 use App\Models\AssetDocument;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class AssetCreate extends Component
 {
@@ -33,34 +34,55 @@ class AssetCreate extends Component
     // Documents
     public $documents = [];
     
-    protected $rules = [
-        'name' => 'required|string|max:255',
-        'category_id' => 'required|exists:categories,id',
-        'location_id' => 'nullable|exists:locations,id',
-        'vendor_id' => 'nullable|exists:vendors,id',
-        'brand' => 'nullable|string|max:255',
-        'model' => 'nullable|string|max:255',
-        'serial_number' => 'nullable|string|max:255',
-        'description' => 'nullable|string',
-        'purchase_price' => 'required|numeric|min:0',
-        'purchase_date' => 'nullable|date',
-        'warranty_end_date' => 'nullable|date|after_or_equal:purchase_date',
-        'status' => 'required|in:tersedia,digunakan,maintenance,disposal',
-        'condition' => 'required|in:baik,rusak_ringan,rusak_berat,hilang',
-        'notes' => 'nullable|string',
-        'documents.*' => 'nullable|file|max:10240',
-    ];
+    protected function rules()
+    {
+        return [
+            'name' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'location_id' => 'nullable|exists:locations,id',
+            'vendor_id' => 'nullable|exists:vendors,id',
+            'brand' => 'nullable|string|max:255',
+            'model' => 'nullable|string|max:255',
+            'serial_number' => [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::unique('assets', 'serial_number')->whereNull('deleted_at'),
+            ],
+            'description' => 'nullable|string',
+            'purchase_price' => 'required|numeric|min:0',
+            'purchase_date' => 'nullable|date|before_or_equal:today',
+            'warranty_end_date' => 'nullable|date|after_or_equal:purchase_date',
+            'status' => 'required|in:tersedia,digunakan,maintenance,disposal',
+            'condition' => 'required|in:baik,rusak_ringan,rusak_berat,hilang',
+            'notes' => 'nullable|string',
+            'documents.*' => 'nullable|file|max:10240',
+        ];
+    }
     
     protected $messages = [
         'name.required' => 'Nama aset harus diisi',
         'category_id.required' => 'Kategori harus dipilih',
         'purchase_price.required' => 'Harga perolehan harus diisi',
         'purchase_price.numeric' => 'Harga harus berupa angka',
+        'purchase_price.min' => 'Harga tidak boleh negatif',
+        'serial_number.unique' => 'Nomor seri sudah terdaftar pada aset lain',
+        'purchase_date.before_or_equal' => 'Tanggal beli tidak boleh di masa depan',
+        'warranty_end_date.after_or_equal' => 'Tanggal garansi harus setelah tanggal beli',
     ];
     
     public function save()
     {
         $this->validate();
+        
+        // Additional validation for serial number (case-insensitive check)
+        if ($this->serial_number) {
+            $existingAsset = Asset::whereRaw('LOWER(serial_number) = ?', [strtolower($this->serial_number)])->first();
+            if ($existingAsset) {
+                $this->addError('serial_number', "Nomor seri sudah terdaftar pada aset {$existingAsset->code} ({$existingAsset->name})");
+                return;
+            }
+        }
         
         $asset = Asset::create([
             'name' => $this->name,
@@ -69,7 +91,7 @@ class AssetCreate extends Component
             'vendor_id' => $this->vendor_id ?: null,
             'brand' => $this->brand,
             'model' => $this->model,
-            'serial_number' => $this->serial_number,
+            'serial_number' => $this->serial_number ?: null,
             'description' => $this->description,
             'purchase_price' => $this->purchase_price,
             'current_value' => $this->purchase_price,
@@ -98,9 +120,6 @@ class AssetCreate extends Component
             }
         }
         
-        // Calculate depreciation
-        $asset->updateCurrentValue();
-        
         session()->flash('message', 'Aset berhasil ditambahkan!');
         
         return $this->redirect(route('assets.index'), navigate: true);
@@ -109,9 +128,9 @@ class AssetCreate extends Component
     public function render()
     {
         return view('livewire.assets.asset-create', [
-            'categories' => Category::all(),
-            'locations' => Location::all(),
-            'vendors' => Vendor::all(),
+            'categories' => Category::orderBy('name')->get(),
+            'locations' => Location::orderBy('name')->get(),
+            'vendors' => Vendor::orderBy('name')->get(),
         ])->layout('layouts.app');
     }
 }

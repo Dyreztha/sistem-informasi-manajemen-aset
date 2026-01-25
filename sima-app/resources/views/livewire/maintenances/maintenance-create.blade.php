@@ -22,20 +22,91 @@
         </div>
     @endif
 
+    @if (session()->has('error'))
+        <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center gap-3">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            {{ session('error') }}
+        </div>
+    @endif
+
     <!-- Form -->
     <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-8">
         <form wire:submit="save">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
+                <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Aset <span class="text-red-500">*</span></label>
-                    <select wire:model="asset_id"
+                    <select wire:model.live="asset_id"
                         class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-900 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors">
                         <option value="">Pilih Aset</option>
                         @foreach($assets as $asset)
-                            <option value="{{ $asset->id }}">{{ $asset->code }} - {{ $asset->name }}</option>
+                            <option value="{{ $asset->id }}">
+                                {{ $asset->code }} - {{ $asset->name }}
+                                @if($asset->status !== 'tersedia')
+                                    ({{ ucfirst($asset->status) }})
+                                @endif
+                            </option>
                         @endforeach
                     </select>
-                    @error('asset_id') <span class="text-sm text-red-500 mt-1">{{ $message }}</span> @enderror
+                    @error('asset_id') <span class="text-sm text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                    
+                    <!-- Asset Info Card -->
+                    @if($selectedAssetInfo)
+                        <div class="mt-3 p-4 rounded-xl border {{ $selectedAssetInfo['has_active_maintenance'] ? 'bg-yellow-50 border-yellow-200' : 'bg-blue-50 border-blue-200' }}">
+                            <div class="flex items-start gap-3">
+                                <div class="flex-shrink-0">
+                                    @if($selectedAssetInfo['has_active_maintenance'])
+                                        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                        </svg>
+                                    @else
+                                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    @endif
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium {{ $selectedAssetInfo['has_active_maintenance'] ? 'text-yellow-800' : 'text-blue-800' }}">
+                                        {{ $selectedAssetInfo['code'] }} - {{ $selectedAssetInfo['name'] }}
+                                    </p>
+                                    <div class="mt-1 text-sm {{ $selectedAssetInfo['has_active_maintenance'] ? 'text-yellow-700' : 'text-blue-700' }}">
+                                        <span class="inline-flex items-center gap-1">
+                                            <span class="font-medium">Status:</span> 
+                                            <span class="capitalize">{{ $selectedAssetInfo['status'] }}</span>
+                                        </span>
+                                        <span class="mx-2">•</span>
+                                        <span class="inline-flex items-center gap-1">
+                                            <span class="font-medium">Kondisi:</span> 
+                                            <span class="capitalize">{{ str_replace('_', ' ', $selectedAssetInfo['condition']) }}</span>
+                                        </span>
+                                    </div>
+                                    @if($selectedAssetInfo['assigned_to'])
+                                        <p class="mt-1 text-sm {{ $selectedAssetInfo['has_active_maintenance'] ? 'text-yellow-700' : 'text-blue-700' }}">
+                                            <span class="font-medium">Digunakan oleh:</span> {{ $selectedAssetInfo['assigned_to'] }}
+                                        </p>
+                                    @endif
+                                    @if($selectedAssetInfo['location'])
+                                        <p class="text-sm {{ $selectedAssetInfo['has_active_maintenance'] ? 'text-yellow-700' : 'text-blue-700' }}">
+                                            <span class="font-medium">Lokasi:</span> {{ $selectedAssetInfo['location'] }}
+                                        </p>
+                                    @endif
+                                    @if($selectedAssetInfo['has_active_maintenance'])
+                                        <p class="mt-2 text-sm font-medium text-yellow-800 bg-yellow-100 px-2 py-1 rounded">
+                                            ⚠️ Aset memiliki {{ $selectedAssetInfo['active_maintenance_count'] }} tiket pemeliharaan aktif
+                                        </p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Judul <span class="text-red-500">*</span></label>
+                    <input type="text" wire:model="title" placeholder="Contoh: Perbaikan layar retak"
+                        class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors">
+                    @error('title') <span class="text-sm text-red-500 mt-1">{{ $message }}</span> @enderror
                 </div>
 
                 <div>
@@ -43,9 +114,9 @@
                     <select wire:model="type"
                         class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-900 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors">
                         <option value="">Pilih Tipe</option>
-                        <option value="preventive">Preventive</option>
-                        <option value="corrective">Corrective</option>
-                        <option value="predictive">Predictive</option>
+                        <option value="scheduled">Terjadwal (Preventive)</option>
+                        <option value="repair">Perbaikan (Corrective)</option>
+                        <option value="inspection">Inspeksi</option>
                     </select>
                     @error('type') <span class="text-sm text-red-500 mt-1">{{ $message }}</span> @enderror
                 </div>
@@ -54,44 +125,53 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">Prioritas <span class="text-red-500">*</span></label>
                     <select wire:model="priority"
                         class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-900 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors">
-                        <option value="">Pilih Prioritas</option>
-                        <option value="low">Low</option>
-                        <option value="medium">Medium</option>
-                        <option value="high">High</option>
-                        <option value="critical">Critical</option>
+                        <option value="low">🟢 Rendah</option>
+                        <option value="medium" selected>🟡 Sedang</option>
+                        <option value="high">🟠 Tinggi</option>
+                        <option value="critical">🔴 Kritis</option>
                     </select>
                     @error('priority') <span class="text-sm text-red-500 mt-1">{{ $message }}</span> @enderror
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Terjadwal <span class="text-red-500">*</span></label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Terjadwal</label>
                     <input type="date" wire:model="scheduled_date"
                         class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-900 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors">
                     @error('scheduled_date') <span class="text-sm text-red-500 mt-1">{{ $message }}</span> @enderror
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Vendor</label>
-                    <select wire:model="vendor_id"
-                        class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-900 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors">
-                        <option value="">Pilih Vendor</option>
-                        @foreach($vendors as $vendor)
-                            <option value="{{ $vendor->id }}">{{ $vendor->name }}</option>
-                        @endforeach
-                    </select>
-                    @error('vendor_id') <span class="text-sm text-red-500 mt-1">{{ $message }}</span> @enderror
-                </div>
-
-                <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Estimasi Biaya</label>
-                    <input type="number" wire:model="estimated_cost" placeholder="0"
-                        class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors">
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">Rp</span>
+                        <input type="number" wire:model="estimated_cost" placeholder="0" min="0"
+                            class="w-full pl-12 pr-4 py-2.5 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors">
+                    </div>
                     @error('estimated_cost') <span class="text-sm text-red-500 mt-1">{{ $message }}</span> @enderror
                 </div>
 
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Ditugaskan Ke</label>
+                    <select wire:model="assigned_to"
+                        class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-900 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors">
+                        <option value="">Pilih Teknisi</option>
+                        @foreach($technicians as $tech)
+                            <option value="{{ $tech->id }}">{{ $tech->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('assigned_to') <span class="text-sm text-red-500 mt-1">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Vendor Eksternal</label>
+                    <input type="text" wire:model="vendor_name" placeholder="Nama vendor jika dikerjakan pihak ketiga"
+                        class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors">
+                    @error('vendor_name') <span class="text-sm text-red-500 mt-1">{{ $message }}</span> @enderror
+                </div>
+
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Deskripsi <span class="text-red-500">*</span></label>
-                    <textarea wire:model="description" rows="3" placeholder="Jelaskan kebutuhan pemeliharaan..."
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Deskripsi Masalah <span class="text-red-500">*</span></label>
+                    <textarea wire:model="description" rows="4" placeholder="Jelaskan detail masalah atau kebutuhan pemeliharaan..."
                         class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors resize-none"></textarea>
                     @error('description') <span class="text-sm text-red-500 mt-1">{{ $message }}</span> @enderror
                 </div>

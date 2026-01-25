@@ -43,30 +43,34 @@
                     @forelse($stockOpnames as $opname)
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {{ $opname->opname_date->format('d/m/Y') }}
+                            {{ $opname->opname_date?->format('d/m/Y') ?? ($opname->start_date?->format('d/m/Y') ?? '-') }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-900">{{ $opname->name }}</div>
-                            <div class="text-sm text-gray-500">By: {{ $opname->user->name }}</div>
+                            <div class="text-sm font-medium text-gray-900">{{ $opname->title }}</div>
+                            <div class="text-sm text-gray-500">By: {{ $opname->creator?->name ?? '-' }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                             {{ $opname->location?->name ?? 'Semua Lokasi' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
+                            @php
+                                $expected = max(1, (int) ($opname->total_expected ?? 0));
+                                $scanned = (int) ($opname->scanned_assets ?? 0);
+                                $progress = min(100, (int) round(($scanned / $expected) * 100));
+                            @endphp
                             <div class="flex items-center gap-2">
                                 <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                    <div class="h-full bg-blue-600 rounded-full" style="width: {{ $opname->progress ?? 0 }}%"></div>
+                                    <div class="h-full bg-blue-600 rounded-full" style="width: {{ $progress }}%"></div>
                                 </div>
-                                <span class="text-sm font-medium text-gray-700">{{ $opname->progress ?? 0 }}%</span>
+                                <span class="text-sm font-medium text-gray-700">{{ $progress }}%</span>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @php
                                 $statusColors = [
-                                    'draft' => 'bg-gray-100 text-gray-700',
+                                    'planned' => 'bg-gray-100 text-gray-700',
                                     'in_progress' => 'bg-blue-100 text-blue-700',
                                     'completed' => 'bg-green-100 text-green-700',
-                                    'cancelled' => 'bg-red-100 text-red-700',
                                 ];
                             @endphp
                             <span class="px-3 py-1 inline-flex text-xs font-semibold rounded-lg {{ $statusColors[$opname->status] ?? 'bg-gray-100 text-gray-700' }}">
@@ -75,8 +79,8 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div class="flex items-center justify-end gap-2">
-                                @if($opname->status === 'in_progress')
-                                    @can('update-stock-opnames')
+                                @if($opname->status === 'planned' || $opname->status === 'in_progress')
+                                    @can('scan-stock-opnames')
                                     <a href="{{ route('stock-opnames.scan', $opname->id) }}" wire:navigate
                                         class="text-blue-600 hover:text-blue-700 transition-colors font-medium">
                                         Scan
@@ -84,20 +88,13 @@
                                     @endcan
                                 @endif
                                 @if($opname->status === 'in_progress')
-                                    @can('update-stock-opnames')
+                                    @can('scan-stock-opnames')
                                     <button wire:click="complete({{ $opname->id }})" 
                                         class="text-green-600 hover:text-green-700 transition-colors font-medium">
                                         Selesaikan
                                     </button>
                                     @endcan
                                 @endif
-                                @can('delete-stock-opnames')
-                                <button wire:click="delete({{ $opname->id }})" 
-                                    wire:confirm="Apakah Anda yakin ingin menghapus sesi ini?"
-                                    class="text-red-600 hover:text-red-700 transition-colors font-medium">
-                                    Hapus
-                                </button>
-                                @endcan
                             </div>
                         </td>
                     </tr>

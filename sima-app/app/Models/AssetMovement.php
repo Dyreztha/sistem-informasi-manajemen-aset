@@ -12,11 +12,14 @@ class AssetMovement extends Model
     protected $fillable = [
         'asset_id', 'type', 'from_location_id', 'to_location_id',
         'from_user_id', 'to_user_id', 'movement_date', 'reason', 'notes',
+        'expected_return_date', 'actual_return_date',
         'bast_number', 'bast_file', 'approved_by', 'approved_at', 'status', 'created_by'
     ];
     
     protected $casts = [
         'movement_date' => 'date',
+        'expected_return_date' => 'date',
+        'actual_return_date' => 'date',
         'approved_at' => 'datetime',
     ];
     

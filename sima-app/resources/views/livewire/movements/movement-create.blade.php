@@ -41,21 +41,77 @@
                         class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-900 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors">
                         <option value="">Pilih Tipe</option>
                         <option value="peminjaman">Peminjaman</option>
-                        <option value="mutasi">Mutasi</option>
+                        <option value="mutasi">Mutasi Lokasi</option>
+                        <option value="pengembalian">Pengembalian</option>
                     </select>
                     @error('type') <span class="text-sm text-red-500 mt-1">{{ $message }}</span> @enderror
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Aset <span class="text-red-500">*</span></label>
-                    <select wire:model="asset_id"
+                    <select wire:model.live="asset_id"
                         class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-900 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors">
                         <option value="">Pilih Aset</option>
                         @foreach($assets as $asset)
-                            <option value="{{ $asset->id }}">{{ $asset->code }} - {{ $asset->name }}</option>
+                            <option value="{{ $asset->id }}">
+                                {{ $asset->code }} - {{ $asset->name }}
+                                @if($asset->status !== 'tersedia')
+                                    ({{ ucfirst($asset->status) }})
+                                @endif
+                            </option>
                         @endforeach
                     </select>
-                    @error('asset_id') <span class="text-sm text-red-500 mt-1">{{ $message }}</span> @enderror
+                    @error('asset_id') <span class="text-sm text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                    
+                    <!-- Asset Info Card -->
+                    @if($selectedAssetInfo)
+                        <div class="mt-3 p-4 rounded-xl border {{ $selectedAssetInfo['is_available'] ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200' }}">
+                            <div class="flex items-start gap-3">
+                                <div class="flex-shrink-0">
+                                    @if($selectedAssetInfo['is_available'])
+                                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    @else
+                                        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                        </svg>
+                                    @endif
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium {{ $selectedAssetInfo['is_available'] ? 'text-green-800' : 'text-yellow-800' }}">
+                                        {{ $selectedAssetInfo['code'] }} - {{ $selectedAssetInfo['name'] }}
+                                    </p>
+                                    <div class="mt-1 text-sm {{ $selectedAssetInfo['is_available'] ? 'text-green-700' : 'text-yellow-700' }}">
+                                        <span class="inline-flex items-center gap-1">
+                                            <span class="font-medium">Status:</span> 
+                                            <span class="capitalize">{{ $selectedAssetInfo['status'] }}</span>
+                                        </span>
+                                        <span class="mx-2">•</span>
+                                        <span class="inline-flex items-center gap-1">
+                                            <span class="font-medium">Kondisi:</span> 
+                                            <span class="capitalize">{{ str_replace('_', ' ', $selectedAssetInfo['condition']) }}</span>
+                                        </span>
+                                    </div>
+                                    @if($selectedAssetInfo['assigned_to'])
+                                        <p class="mt-1 text-sm {{ $selectedAssetInfo['is_available'] ? 'text-green-700' : 'text-yellow-700' }}">
+                                            <span class="font-medium">Digunakan oleh:</span> {{ $selectedAssetInfo['assigned_to'] }}
+                                        </p>
+                                    @endif
+                                    @if($selectedAssetInfo['location'])
+                                        <p class="text-sm {{ $selectedAssetInfo['is_available'] ? 'text-green-700' : 'text-yellow-700' }}">
+                                            <span class="font-medium">Lokasi:</span> {{ $selectedAssetInfo['location'] }}
+                                        </p>
+                                    @endif
+                                    @if($selectedAssetInfo['unavailability_reason'])
+                                        <p class="mt-2 text-sm font-medium text-yellow-800 bg-yellow-100 px-2 py-1 rounded">
+                                            ⚠️ {{ $selectedAssetInfo['unavailability_reason'] }}
+                                        </p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
                 <div>
@@ -79,7 +135,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Pengembalian</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Pengembalian <span class="text-red-500">*</span></label>
                     <input type="date" wire:model="expected_return_date"
                         class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-900 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors">
                     @error('expected_return_date') <span class="text-sm text-red-500 mt-1">{{ $message }}</span> @enderror
@@ -101,8 +157,15 @@
                 @endif
 
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Catatan</label>
-                    <textarea wire:model="notes" rows="3" placeholder="Tambahkan catatan transaksi..."
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Alasan/Keperluan <span class="text-red-500">*</span></label>
+                    <textarea wire:model="reason" rows="2" placeholder="Jelaskan alasan atau keperluan transaksi..."
+                        class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors resize-none"></textarea>
+                    @error('reason') <span class="text-sm text-red-500 mt-1">{{ $message }}</span> @enderror
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Catatan Tambahan</label>
+                    <textarea wire:model="notes" rows="2" placeholder="Catatan tambahan (opsional)..."
                         class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors resize-none"></textarea>
                     @error('notes') <span class="text-sm text-red-500 mt-1">{{ $message }}</span> @enderror
                 </div>

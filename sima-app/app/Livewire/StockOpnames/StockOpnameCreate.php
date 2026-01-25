@@ -9,11 +9,13 @@ use Illuminate\Support\Facades\Auth;
 
 class StockOpnameCreate extends Component
 {
+    public $title = '';
     public $location_id = '';
     public $opname_date = '';
     public $notes = '';
     
     protected $rules = [
+        'title' => 'required|string|max:255',
         'location_id' => 'nullable|exists:locations,id',
         'opname_date' => 'required|date',
         'notes' => 'nullable|string',
@@ -29,10 +31,13 @@ class StockOpnameCreate extends Component
         $this->validate();
         
         $opname = StockOpname::create([
+            'title' => $this->title,
             'location_id' => $this->location_id ?: null,
             'opname_date' => $this->opname_date,
+            'start_date' => $this->opname_date,
             'notes' => $this->notes,
-            'status' => 'draft',
+            'status' => 'planned',
+            'created_by' => Auth::id(),
             'conducted_by' => Auth::id(),
         ]);
         

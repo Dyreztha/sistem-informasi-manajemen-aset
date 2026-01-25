@@ -1,3 +1,29 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* QR Scanner styling (PRD 6.3) */
+#qr-reader {
+	background: #111827;
+}
+
+#qr-reader__dashboard,
+#qr-reader__header_message {
+	display: none !important;
+}
+
+.qr-shaded-region {
+	display: none !important;
+}
+
+#qr-reader__scan_region {
+	width: 100% !important;
+	height: 100% !important;
+}
+
+#qr-reader__scan_region video,
+#qr-reader__scan_region canvas {
+	width: 100% !important;
+	height: 100% !important;
+	object-fit: cover;
+}

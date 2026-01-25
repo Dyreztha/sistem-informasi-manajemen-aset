@@ -8,7 +8,7 @@
             </svg>
         </a>
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">{{ $stockOpname->name }}</h1>
+            <h1 class="text-2xl font-bold text-gray-900">{{ $stockOpname->title }}</h1>
             <p class="text-gray-500 mt-1">Scan QR Code aset untuk verifikasi</p>
         </div>
     </div>
@@ -68,7 +68,7 @@
                 </div>
                 <div>
                     <p class="text-sm text-gray-500">Belum Scan</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ $totalAssets - $scannedCount }}</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ max($totalAssets - $scannedCount, 0) }}</p>
                 </div>
             </div>
         </div>
@@ -88,33 +88,62 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Scanner Section -->
-        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">QR Scanner</h3>
-            <div class="space-y-4">
-                <div class="relative">
-                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
-                    </svg>
-                    <input type="text" wire:model="scanCode" wire:keydown.enter="scanAsset" 
-                        placeholder="Scan atau ketik kode aset..."
-                        class="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors text-lg"
-                        autofocus>
+        <!-- Scanner Section (PRD 6.3) -->
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            <!-- Camera Viewfinder -->
+            <div class="relative bg-gray-900" wire:ignore>
+                <div id="qr-reader" class="w-full aspect-square"></div>
+                <div class="absolute inset-0 pointer-events-none">
+                    <div class="absolute inset-6 border-2 border-white/60 rounded-lg"></div>
                 </div>
-                <button wire:click="scanAsset"
-                    class="w-full px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-sm transition-all duration-300">
-                    <div class="flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        Verifikasi Aset
-                    </div>
-                </button>
             </div>
 
-            <!-- Camera Scanner -->
-            <div class="mt-6">
-                <div id="qr-reader" class="w-full rounded-xl overflow-hidden bg-gray-100 border border-gray-200"></div>
+            <!-- Scan Info (Scanned / Last / Status) -->
+            <div class="p-4 bg-gray-50 border-t border-gray-200 space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-600">Scanned:</span>
+                    <span class="text-base font-semibold text-gray-900">{{ $scannedCount }} / {{ $totalAssets }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-600">Last:</span>
+                    <span class="text-sm font-medium text-gray-900 truncate ml-2">
+                        {{ $lastScannedAsset ? $lastScannedAsset->name : '-' }}
+                    </span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-600">Status:</span>
+                    @if($lastScannedAsset)
+                        <span class="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-sm font-semibold rounded-lg">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Match
+                        </span>
+                    @else
+                        <span class="text-sm text-gray-400">-</span>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Manual Input -->
+            <div class="p-4 border-t border-gray-200">
+                <div class="flex gap-2">
+                    <div class="relative flex-1">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+                        </svg>
+                        <input type="text" wire:model="manualCode" wire:keydown.enter="processAsset"
+                            placeholder="Ketik kode aset..."
+                            class="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors"
+                            autofocus>
+                    </div>
+                    <button wire:click="processAsset"
+                        class="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-sm transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -136,10 +165,10 @@
                                 'rusak_berat' => 'bg-red-100 text-red-700',
                             ];
                         @endphp
-                        <span class="px-3 py-1 inline-flex text-xs font-semibold rounded-lg {{ $conditionColors[$detail->condition] ?? 'bg-gray-100 text-gray-700' }}">
-                            {{ ucfirst(str_replace('_', ' ', $detail->condition)) }}
+                        <span class="px-3 py-1 inline-flex text-xs font-semibold rounded-lg {{ $conditionColors[$detail->actual_condition] ?? 'bg-gray-100 text-gray-700' }}">
+                            {{ ucfirst(str_replace('_', ' ', $detail->actual_condition ?? 'N/A')) }}
                         </span>
-                        <p class="text-xs text-gray-400 mt-1">{{ $detail->scanned_at->format('H:i:s') }}</p>
+                        <p class="text-xs text-gray-400 mt-1">{{ $detail->scanned_at?->format('H:i:s') ?? '-' }}</p>
                     </div>
                 </div>
                 @empty
@@ -153,6 +182,19 @@
                 @endforelse
             </div>
         </div>
+    </div>
+
+    <!-- Complete Button -->
+    <div class="mt-6 flex justify-end">
+        <button wire:click="completeOpname" wire:confirm="Apakah Anda yakin ingin menyelesaikan stock opname ini? Aset yang belum di-scan akan ditandai sebagai 'Hilang'."
+            class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl shadow-sm transition-all duration-300">
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Selesaikan Stock Opname
+            </div>
+        </button>
     </div>
 
     <!-- Condition Modal -->
@@ -169,11 +211,11 @@
                     </button>
                 </div>
 
-                @if($scannedAsset)
+                @if($lastScannedAsset)
                 <div class="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
                     <div class="space-y-2">
-                        <p class="text-sm text-gray-600">Kode: <span class="font-semibold text-gray-900">{{ $scannedAsset->code }}</span></p>
-                        <p class="text-sm text-gray-600">Nama: <span class="font-semibold text-gray-900">{{ $scannedAsset->name }}</span></p>
+                        <p class="text-sm text-gray-600">Kode: <span class="font-semibold text-gray-900">{{ $lastScannedAsset->code }}</span></p>
+                        <p class="text-sm text-gray-600">Nama: <span class="font-semibold text-gray-900">{{ $lastScannedAsset->name }}</span></p>
                     </div>
                 </div>
                 @endif

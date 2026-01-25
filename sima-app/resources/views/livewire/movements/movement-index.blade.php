@@ -100,39 +100,56 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @php
-                                $statusColors = [
-                                    'pending' => 'bg-yellow-100 text-yellow-700',
-                                    'active' => 'bg-green-100 text-green-700',
-                                    'returned' => 'bg-blue-100 text-blue-700',
-                                    'rejected' => 'bg-red-100 text-red-700',
-                                ];
+                                $isReturned = $movement->type === 'peminjaman' && $movement->actual_return_date;
+                                $displayStatus = match(true) {
+                                    $movement->status === 'pending' => 'Pending',
+                                    $movement->status === 'rejected' => 'Ditolak',
+                                    $isReturned => 'Dikembalikan',
+                                    $movement->status === 'approved' && $movement->type === 'peminjaman' => 'Disetujui',
+                                    $movement->status === 'approved' && $movement->type === 'mutasi' => 'Selesai',
+                                    $movement->status === 'approved' && $movement->type === 'pengembalian' => 'Selesai',
+                                    default => ucfirst($movement->status),
+                                };
+                                $statusClass = match(true) {
+                                    $movement->status === 'pending' => 'bg-yellow-100 text-yellow-700',
+                                    $movement->status === 'rejected' => 'bg-red-100 text-red-700',
+                                    $isReturned => 'bg-blue-100 text-blue-700',
+                                    $movement->status === 'approved' => 'bg-green-100 text-green-700',
+                                    default => 'bg-gray-100 text-gray-700',
+                                };
                             @endphp
-                            <span class="px-3 py-1 inline-flex text-xs font-semibold rounded-lg {{ $statusColors[$movement->status] ?? 'bg-gray-100 text-gray-700' }}">
-                                {{ ucfirst($movement->status) }}
+                            <span class="px-3 py-1 inline-flex text-xs font-semibold rounded-lg {{ $statusClass }}">
+                                {{ $displayStatus }}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div class="flex items-center justify-end gap-2">
-                                @can('approve-movements')
                                 @if($movement->status === 'pending')
                                     <button wire:click="approveMovement({{ $movement->id }})" 
-                                        class="text-green-600 hover:text-green-700 transition-colors font-medium">
-                                        Approve
+                                        class="px-3 py-1.5 bg-green-100 text-green-700 hover:bg-green-200 rounded-lg transition-colors font-medium text-xs">
+                                        ✓ Approve
                                     </button>
                                     <button wire:click="rejectMovement({{ $movement->id }})" 
-                                        class="text-red-600 hover:text-red-700 transition-colors font-medium">
-                                        Reject
+                                        class="px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors font-medium text-xs">
+                                        ✗ Reject
                                     </button>
                                 @endif
-                                @endcan
                                 
-                                @if($movement->type === 'peminjaman' && $movement->status === 'active')
-                                    @can('create-movements')
+                                @if($movement->type === 'peminjaman' && $movement->status === 'approved' && !$movement->actual_return_date)
                                     <button wire:click="openReturnModal({{ $movement->id }})" 
-                                        class="text-blue-600 hover:text-blue-700 transition-colors font-medium">
+                                        class="px-3 py-1.5 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg transition-colors font-medium text-xs">
                                         Kembalikan
                                     </button>
-                                    @endcan
+                                @endif
+
+                                @if($movement->status === 'approved' && $movement->type === 'peminjaman' && !$movement->actual_return_date)
+                                    <span class="text-xs text-gray-500">Dipinjam</span>
+                                @elseif($movement->type === 'peminjaman' && $movement->actual_return_date)
+                                    <span class="text-xs text-gray-500">Dikembalikan</span>
+                                @elseif($movement->status === 'approved' && $movement->type !== 'peminjaman')
+                                    <span class="text-xs text-gray-500">Selesai</span>
+                                @elseif($movement->status === 'rejected')
+                                    <span class="text-xs text-gray-500">Ditolak</span>
                                 @endif
                             </div>
                         </td>

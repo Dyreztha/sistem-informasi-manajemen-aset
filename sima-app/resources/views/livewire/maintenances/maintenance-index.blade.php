@@ -174,7 +174,7 @@
         <div class="w-full max-w-md bg-white rounded-2xl border border-gray-200 shadow-xl">
             <div class="p-6">
                 <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-xl font-bold text-gray-900">Update Status</h3>
+                    <h3 class="text-xl font-bold text-gray-900">Update Status Pemeliharaan</h3>
                     <button wire:click="$set('showUpdateModal', false)" class="text-gray-400 hover:text-gray-600 transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -184,8 +184,33 @@
 
                 <div class="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
                     <div class="space-y-2">
-                        <p class="text-sm text-gray-600">Aset: <span class="font-semibold text-gray-900">{{ $selectedMaintenance->asset->name }}</span></p>
-                        <p class="text-sm text-gray-600">Tipe: <span class="font-semibold text-gray-900">{{ ucfirst($selectedMaintenance->type) }}</span></p>
+                        <p class="text-sm text-gray-600">Tiket: <span class="font-semibold text-gray-900">{{ $selectedMaintenance->ticket_number }}</span></p>
+                        <p class="text-sm text-gray-600">Aset: <span class="font-semibold text-gray-900">{{ $selectedMaintenance->asset->code }} - {{ $selectedMaintenance->asset->name }}</span></p>
+                        <p class="text-sm text-gray-600">Tipe: <span class="font-semibold text-gray-900">
+                            @switch($selectedMaintenance->type)
+                                @case('scheduled') Terjadwal @break
+                                @case('repair') Perbaikan @break
+                                @case('inspection') Inspeksi @break
+                                @default {{ ucfirst($selectedMaintenance->type) }}
+                            @endswitch
+                        </span></p>
+                        <p class="text-sm text-gray-600">Status Saat Ini: 
+                            <span class="font-semibold px-2 py-0.5 rounded text-xs
+                                @switch($selectedMaintenance->status)
+                                    @case('pending') bg-yellow-100 text-yellow-700 @break
+                                    @case('in_progress') bg-blue-100 text-blue-700 @break
+                                    @case('completed') bg-green-100 text-green-700 @break
+                                    @case('cancelled') bg-gray-100 text-gray-700 @break
+                                @endswitch
+                            ">
+                                @switch($selectedMaintenance->status)
+                                    @case('pending') Menunggu @break
+                                    @case('in_progress') Dikerjakan @break
+                                    @case('completed') Selesai @break
+                                    @case('cancelled') Dibatalkan @break
+                                @endswitch
+                            </span>
+                        </p>
                     </div>
                 </div>
 
@@ -194,20 +219,45 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">Status Baru</label>
                         <select wire:model="updateStatus"
                             class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-900 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors">
-                            <option value="pending">Pending</option>
-                            <option value="in_progress">In Progress</option>
-                            <option value="completed">Completed</option>
-                            <option value="cancelled">Cancelled</option>
+                            @if($selectedMaintenance->status === 'pending')
+                                <option value="pending">Menunggu</option>
+                                <option value="in_progress">Mulai Dikerjakan</option>
+                                <option value="cancelled">Batalkan</option>
+                            @elseif($selectedMaintenance->status === 'in_progress')
+                                <option value="in_progress">Dikerjakan</option>
+                                <option value="completed">Selesai</option>
+                                <option value="cancelled">Batalkan</option>
+                            @else
+                                <option value="{{ $selectedMaintenance->status }}">{{ ucfirst($selectedMaintenance->status) }}</option>
+                            @endif
                         </select>
                     </div>
+
+                    @if($updateStatus === 'completed')
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Biaya</label>
-                        <input type="number" wire:model="updateCost" placeholder="0"
-                            class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Kondisi Aset Setelah Perbaikan</label>
+                        <select wire:model="resultCondition"
+                            class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-900 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors">
+                            <option value="baik">✅ Baik</option>
+                            <option value="rusak_ringan">⚠️ Rusak Ringan</option>
+                            <option value="rusak_berat">❌ Rusak Berat</option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">Kondisi aset akan diperbarui setelah pemeliharaan selesai</p>
                     </div>
+                    @endif
+
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Catatan</label>
-                        <textarea wire:model="updateNotes" rows="3" placeholder="Tambahkan catatan..."
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Biaya Aktual</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">Rp</span>
+                            <input type="number" wire:model="actualCost" placeholder="0" min="0"
+                                class="w-full pl-12 pr-4 py-2.5 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Catatan Teknisi</label>
+                        <textarea wire:model="updateNotes" rows="3" placeholder="Tambahkan catatan pekerjaan yang dilakukan..."
                             class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors resize-none"></textarea>
                     </div>
                 </div>
@@ -219,7 +269,7 @@
                     </button>
                     <button wire:click="updateMaintenance"
                         class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-sm transition-all duration-300">
-                        Update
+                        Update Status
                     </button>
                 </div>
             </div>

@@ -33,7 +33,3 @@ Gunakan akun berikut setelah seeding:
 - Manager: manager@sima.com / password
 - Staff: staff@sima.com / password
 - Auditor: auditor@sima.com / password
-
-## Catatan
-- Halaman `/assets` memerlukan login.
-- Jika ada perubahan UI, lakukan `npm run build` ulang.

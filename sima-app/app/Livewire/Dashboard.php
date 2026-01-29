@@ -21,27 +21,27 @@ class Dashboard extends Component
     public $recentMovements = [];
     public $assetsByCategory = [];
     public $assetsByLocation = [];
-    
+
     public function mount()
     {
         $this->loadStatistics();
     }
-    
+
     public function loadStatistics()
     {
         // Total Aset
         $this->totalAssets = Asset::count();
-        
+
         // Total Nilai
         $this->totalValue = Asset::sum('purchase_price');
         $this->currentValue = Asset::sum('current_value');
-        
+
         // Kondisi Aset
         $this->assetsCondition = Asset::select('condition', DB::raw('count(*) as total'))
             ->groupBy('condition')
             ->pluck('total', 'condition')
             ->toArray();
-        
+
         // Maintenance Alerts (H-7 atau sudah jatuh tempo)
         $this->maintenanceAlerts = Maintenance::with('asset')
             ->where('status', '!=', 'completed')
@@ -52,28 +52,29 @@ class Dashboard extends Component
             ->orderBy('scheduled_date')
             ->limit(5)
             ->get();
-        
+
         // Recent Movements
         $this->recentMovements = AssetMovement::with(['asset', 'toLocation', 'toUser'])
             ->latest()
             ->limit(5)
             ->get();
-        
+
         // Assets by Category
-        $this->assetsByCategory = Category::withCount('assets')
-            ->having('assets_count', '>', 0)
+        $this->assetsByCategory = Category::whereHas('assets')
+            ->withCount('assets')
             ->get()
-            ->map(function($cat) {
+            ->map(function ($cat) {
                 return [
-                    'name' => $cat->name,
-                    'count' => $cat->assets_count
+                    'name'  => $cat->name,
+                    'count' => $cat->assets_count,
                 ];
             })
             ->toArray();
-        
+
+
         // Assets by Location
-        $this->assetsByLocation = Location::withCount('assets')
-            ->having('assets_count', '>', 0)
+        $this->assetsByLocation = Location::whereHas('assets')
+            ->withCount('assets')
             ->limit(5)
             ->get()
             ->map(function($loc) {
@@ -84,7 +85,7 @@ class Dashboard extends Component
             })
             ->toArray();
     }
-    
+
     public function getConditionLabel($condition)
     {
         return match($condition) {
@@ -95,7 +96,7 @@ class Dashboard extends Component
             default => $condition
         };
     }
-    
+
     public function getConditionColor($condition)
     {
         return match($condition) {
@@ -106,7 +107,7 @@ class Dashboard extends Component
             default => 'bg-blue-500'
         };
     }
-    
+
     public function render()
     {
         return view('livewire.dashboard');

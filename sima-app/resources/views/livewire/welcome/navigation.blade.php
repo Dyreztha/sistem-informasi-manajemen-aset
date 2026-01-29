@@ -9,7 +9,7 @@
     @else
         <a
             href="{{ route('login') }}"
-            class="px-5 py-2.5 text-slate-300 hover:text-white transition-colors font-medium"
+            class="leading-none px-5 py-2.5 text-black-300 hover:text-slate-500 hover:translate-y-[-1px] transition-transform duration-300 transition-colors font-medium"
         >
             Log in
         </a>
@@ -17,7 +17,7 @@
         @if (Route::has('register'))
             <a
                 href="{{ route('register') }}"
-                class="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-semibold shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all duration-300"
+                class="leading-none px-5 py-2.5 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-semibold shadow-lg shadow-blue-500/30 hover:translate-y-[-1px] hover:shadow-blue-500/50 transition-all duration-300"
             >
                 Register
             </a>

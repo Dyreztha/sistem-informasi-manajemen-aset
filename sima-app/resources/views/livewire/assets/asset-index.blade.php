@@ -2,7 +2,7 @@
     <x-slot name="header">
         Daftar Aset
     </x-slot>
-    
+
     <!-- Header Actions -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
@@ -10,8 +10,8 @@
             <p class="text-gray-600 mt-1">Kelola semua aset perusahaan</p>
         </div>
         @can('create-assets')
-        <a href="{{ route('assets.create') }}" wire:navigate 
-           class="mt-4 sm:mt-0 inline-flex items-center px-4 py-2.5 bg-blue-600 hover:bg-blue-700 rounded-xl font-semibold text-sm text-white shadow-sm transition-all">
+        <a href="{{ route('assets.create') }}" wire:navigate
+           class="mt-4 sm:mt-0 inline-flex items-center px-4 py-2.5 bg-blue-600 hover:bg-blue-700 rounded-xl font-semibold text-sm text-white shadow-sm transition-all hover:scale-[1.01] transition-transform duration-40">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
@@ -19,7 +19,7 @@
         </a>
         @endcan
     </div>
-    
+
     <!-- Flash Message -->
     @if (session()->has('message'))
         <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl flex items-center" role="alert">
@@ -29,7 +29,7 @@
             {{ session('message') }}
         </div>
     @endif
-    
+
     <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
         <div class="p-6">
             <!-- Filters -->
@@ -41,29 +41,29 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                     </div>
-                    <input wire:model.live.debounce.300ms="search" type="text" placeholder="Cari nama, kode, atau serial number..." 
-                        class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <input wire:model.live.debounce.300ms="search" type="text" placeholder="Cari nama, kode, atau serial number..."
+                        class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:ring-2 hover:ring-blue-500">
                 </div>
-                
+
                 <!-- Category Filter -->
-                <select wire:model.live="categoryFilter" class="py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <select wire:model.live="categoryFilter" class="py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer hover:ring-2 hover:ring-blue-500">
                     <option value="">Semua Kategori</option>
                     @foreach($categories as $category)
-                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                        <option value="{{ $category->id }}" >{{ $category->name }}</option>
                     @endforeach
                 </select>
-                
+
                 <!-- Status Filter -->
-                <select wire:model.live="statusFilter" class="py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <select wire:model.live="statusFilter" class="py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer hover:ring-2 hover:ring-blue-500">
                     <option value="">Semua Status</option>
                     <option value="tersedia">Tersedia</option>
                     <option value="digunakan">Digunakan</option>
                     <option value="maintenance">Maintenance</option>
                     <option value="disposal">Disposal</option>
                 </select>
-                
+
                 <!-- Condition Filter -->
-                <select wire:model.live="conditionFilter" class="py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <select wire:model.live="conditionFilter" class="py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer hover:ring-2 hover:ring-blue-500">
                     <option value="">Semua Kondisi</option>
                     <option value="baik">Baik</option>
                     <option value="rusak_ringan">Rusak Ringan</option>
@@ -71,7 +71,8 @@
                     <option value="hilang">Hilang</option>
                 </select>
             </div>
-            
+
+
             <!-- Reset Filters -->
             @if($search || $categoryFilter || $statusFilter || $conditionFilter || $locationFilter)
                 <div class="mb-4">
@@ -83,7 +84,7 @@
                     </button>
                 </div>
             @endif
-            
+
             <!-- Table -->
             <div class="overflow-x-auto">
                 <table class="min-w-full">
@@ -179,24 +180,24 @@
                                         </td>
                                         <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <div class="flex justify-end space-x-1">
-                                                <a href="{{ route('assets.show', $asset) }}" wire:navigate 
-                                                   class="p-2 rounded-lg text-gray-500 hover:text-blue-600 hover:bg-gray-100 transition-colors" title="Lihat">
+                                                <a href="{{ route('assets.show', $asset) }}" wire:navigate
+                                                   class="p-2 rounded-lg text-gray-500 hover:text-blue-600 hover:bg-gray-100 transition-colors hover:translate-y-[-1px]" title="Lihat">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                                     </svg>
                                                 </a>
                                                 @can('edit-assets')
-                                                <a href="{{ route('assets.edit', $asset) }}" wire:navigate 
-                                                   class="p-2 rounded-lg text-gray-500 hover:text-amber-600 hover:bg-gray-100 transition-colors" title="Edit">
+                                                <a href="{{ route('assets.edit', $asset) }}" wire:navigate
+                                                   class="p-2 rounded-lg text-gray-500 hover:text-amber-600 hover:bg-gray-100 transition-colors hover:translate-y-[-1px]" title="Edit">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                                     </svg>
                                                 </a>
                                                 @endcan
                                                 @can('delete-assets')
-                                                <button wire:click="confirmDelete({{ $asset->id }})" 
-                                                        class="p-2 rounded-lg text-gray-500 hover:text-red-600 hover:bg-gray-100 transition-colors" title="Hapus">
+                                                <button wire:click="confirmDelete({{ $asset->id }})"
+                                                        class="p-2 rounded-lg text-gray-500 hover:text-red-600 hover:bg-gray-100 transition-colors hover:translate-y-[-1px]" title="Hapus">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                                     </svg>
@@ -220,14 +221,14 @@
                             </tbody>
                         </table>
                     </div>
-                    
+
                     <!-- Pagination -->
                     <div class="mt-6">
                         {{ $assets->links() }}
                     </div>
                 </div>
             </div>
-    
+
     <!-- Delete Modal -->
     @if($showDeleteModal)
     <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -246,11 +247,11 @@
                     </div>
                 </div>
                 <div class="mt-6 flex justify-end space-x-3">
-                    <button wire:click="$set('showDeleteModal', false)" type="button" 
+                    <button wire:click="$set('showDeleteModal', false)" type="button"
                             class="px-4 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-xl font-medium transition-colors">
                         Batal
                     </button>
-                    <button wire:click="deleteAsset" type="button" 
+                    <button wire:click="deleteAsset" type="button"
                             class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium transition-colors">
                         Hapus
                     </button>

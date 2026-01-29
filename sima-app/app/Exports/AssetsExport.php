@@ -13,12 +13,12 @@ use Illuminate\Http\Request;
 class AssetsExport implements FromCollection, WithHeadings, WithMapping, WithStyles
 {
     protected $request;
-    
+
     public function __construct(Request $request)
     {
         $this->request = $request;
     }
-    
+
     public function collection()
     {
         return Asset::with(['category', 'location', 'vendor', 'currentUser'])
@@ -28,7 +28,7 @@ class AssetsExport implements FromCollection, WithHeadings, WithMapping, WithSty
             ->orderBy('code')
             ->get();
     }
-    
+
     public function headings(): array
     {
         return [
@@ -48,7 +48,7 @@ class AssetsExport implements FromCollection, WithHeadings, WithMapping, WithSty
             'Pengguna',
         ];
     }
-    
+
     public function map($asset): array
     {
         return [
@@ -68,7 +68,8 @@ class AssetsExport implements FromCollection, WithHeadings, WithMapping, WithSty
             $asset->currentUser?->name ?? '-',
         ];
     }
-    
+
+
     public function styles(Worksheet $sheet)
     {
         return [

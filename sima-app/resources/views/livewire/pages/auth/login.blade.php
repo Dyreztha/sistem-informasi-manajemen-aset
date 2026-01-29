@@ -39,7 +39,7 @@ new #[Layout('layouts.guest')] class extends Component
                     </svg>
                 </div>
                 <input wire:model="form.email" id="email" type="email" name="email" required autofocus autocomplete="username"
-                       class="block w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                       class="block w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:ring-2 hover:ring-blue-500"
                        placeholder="nama@email.com">
             </div>
             @error('form.email')
@@ -57,7 +57,7 @@ new #[Layout('layouts.guest')] class extends Component
                     </svg>
                 </div>
                 <input wire:model="form.password" id="password" type="password" name="password" required autocomplete="current-password"
-                       class="block w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                       class="block w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:ring-2 hover:ring-blue-500"
                        placeholder="••••••••">
             </div>
             @error('form.password')
@@ -72,7 +72,7 @@ new #[Layout('layouts.guest')] class extends Component
                        class="w-4 h-4 rounded border-gray-300 bg-white text-blue-600 focus:ring-blue-500 focus:ring-offset-white">
                 <span class="ml-2 text-sm text-gray-600">Ingat saya</span>
             </label>
-            
+
             @if (Route::has('password.request'))
                 <a class="text-sm text-blue-600 hover:text-blue-700 transition-colors" href="{{ route('password.request') }}" wire:navigate>
                     Lupa password?
@@ -81,7 +81,7 @@ new #[Layout('layouts.guest')] class extends Component
         </div>
 
         <!-- Submit Button -->
-        <button type="submit" 
+        <button type="submit"
                 class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-sm transition-all duration-200 flex items-center justify-center space-x-2">
             <span wire:loading.remove wire:target="login">Masuk</span>
             <svg wire:loading wire:target="login" class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">

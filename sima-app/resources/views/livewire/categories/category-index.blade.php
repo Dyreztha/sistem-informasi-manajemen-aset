@@ -6,7 +6,7 @@
             <p class="text-sm text-gray-500 mt-1">Kelola kategori aset dan pengaturan depresiasi</p>
         </div>
         @can('create-categories')
-        <button wire:click="openCreateModal" 
+        <button wire:click="openCreateModal"
             class="inline-flex items-center px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold shadow-sm transition-all duration-300">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -115,13 +115,13 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Kode</label>
-                        <input type="text" wire:model="code" 
+                        <input type="text" wire:model="code"
                             class="w-full bg-white border-gray-300 text-gray-900 placeholder-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500">
                         @error('code') <span class="text-red-600 text-sm mt-1 block">{{ $message }}</span> @enderror
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Nama</label>
-                        <input type="text" wire:model="name" 
+                        <input type="text" wire:model="name"
                             class="w-full bg-white border-gray-300 text-gray-900 placeholder-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500">
                         @error('name') <span class="text-red-600 text-sm mt-1 block">{{ $message }}</span> @enderror
                     </div>

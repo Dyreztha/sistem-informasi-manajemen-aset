@@ -1,14 +1,14 @@
-<div>
+<div class="animate-fadeinDashboardAdmin">
     <!-- Welcome Section -->
-    <div class="mb-8">
+    <div class="mb-8 ">
         <h1 class="text-2xl font-bold text-gray-900 mb-2">Selamat Datang, {{ auth()->user()->name }}!</h1>
         <p class="text-gray-600">Berikut adalah ringkasan data aset anda hari ini.</p>
     </div>
-    
+
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <!-- Total Aset -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-blue-500 p-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-blue-500 p-6 hover:translate-y-[-10px] transition-transform duration-300 hover:shadow-lg hover:shadow-blue-500">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-500 text-sm font-medium">Total Aset</p>
@@ -27,9 +27,9 @@
                 Aktif & Terdaftar
             </div>
         </div>
-        
+
         <!-- Total Nilai Perolehan -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-emerald-500 p-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-emerald-500 p-6 hover:translate-y-[-10px] transition-transform duration-300 hover:shadow-lg hover:shadow-emerald-500">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-500 text-sm font-medium">Nilai Perolehan</p>
@@ -45,9 +45,9 @@
                 <span class="truncate">Total Investasi Aset</span>
             </div>
         </div>
-        
+
         <!-- Nilai Saat Ini -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-amber-500 p-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-amber-500 p-6 hover:translate-y-[-10px] transition-transform duration-300 hover:shadow-lg hover:shadow-amber-500">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-500 text-sm font-medium">Nilai Saat Ini</p>
@@ -63,9 +63,9 @@
                 Setelah Penyusutan
             </div>
         </div>
-        
+
         <!-- Maintenance Alert -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-rose-500 p-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-rose-500 p-6 hover:translate-y-[-10px] transition-transform duration-300 hover:shadow-lg hover:shadow-rose-500">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-500 text-sm font-medium">Maintenance Alert</p>
@@ -82,7 +82,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Kondisi Aset Chart -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <!-- Kondisi Aset -->
@@ -118,7 +118,7 @@
                 @endforeach
             </div>
         </div>
-        
+
         <!-- Aset per Kategori -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-6">
@@ -128,7 +128,7 @@
             @if(count($assetsByCategory) > 0)
                 <div class="space-y-3">
                     @foreach($assetsByCategory as $index => $cat)
-                        <div class="flex items-center p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                        <div class="flex items-center p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors hover:translate-y-[-1px]">
                             <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
                                 {{ $index + 1 }}
                             </div>
@@ -151,7 +151,7 @@
             @endif
         </div>
     </div>
-    
+
     <!-- Recent Activities -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Maintenance Alerts -->
@@ -162,7 +162,7 @@
                     <h3 class="text-lg font-semibold text-gray-900">Maintenance Alerts</h3>
                 </div>
                 @can('view-maintenances')
-                <a href="{{ route('maintenances.index') }}" class="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors" wire:navigate>
+                <a href="{{ route('maintenances.index') }}" class="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors hover:translate-y-[-1px]" wire:navigate>
                     Lihat Semua →
                 </a>
                 @endcan
@@ -199,13 +199,13 @@
                 </div>
             @endif
         </div>
-        
+
         <!-- Recent Movements -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-lg font-semibold text-gray-900">Pergerakan Terakhir</h3>
                 @can('view-movements')
-                <a href="{{ route('movements.index') }}" class="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors" wire:navigate>
+                <a href="{{ route('movements.index') }}" class="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors hover:translate-y-[-1px]" wire:navigate>
                     Lihat Semua →
                 </a>
                 @endcan
@@ -238,7 +238,7 @@
                             <div class="ml-4 flex-1 min-w-0">
                                 <p class="text-sm font-medium text-gray-900 truncate">{{ $movement->asset->name ?? 'N/A' }}</p>
                                 <p class="text-xs text-gray-500 truncate">
-                                    {{ ucfirst($movement->type) }} 
+                                    {{ ucfirst($movement->type) }}
                                     @if($movement->toLocation)
                                         → {{ $movement->toLocation->name }}
                                     @endif

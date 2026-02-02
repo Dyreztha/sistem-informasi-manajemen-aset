@@ -5,6 +5,39 @@
         <p class="text-gray-600">Berikut adalah ringkasan data aset anda hari ini.</p>
     </div>
 
+    @php
+        if (!function_exists('format_rupiah_compact')) {
+            function format_rupiah_compact($value): string
+            {
+                $value = (float) $value;
+
+                if ($value >= 1000000000000) {
+                    $formatted = number_format($value / 1000000000000, 1, ',', '.');
+                    $formatted = rtrim(rtrim($formatted, '0'), ',');
+                    return $formatted . 'T';
+                }
+
+                if ($value >= 1000000000) {
+                    $formatted = number_format($value / 1000000000, 1, ',', '.');
+                    $formatted = rtrim(rtrim($formatted, '0'), ',');
+                    return $formatted . 'M';
+                }
+
+                if ($value >= 1000000) {
+                    $formatted = number_format($value / 1000000, 1, ',', '.');
+                    $formatted = rtrim(rtrim($formatted, '0'), ',');
+                    return $formatted . 'jt';
+                }
+
+                if ($value >= 1000) {
+                    return number_format($value / 1000, 0, ',', '.') . 'rb';
+                }
+
+                return number_format($value, 0, ',', '.');
+            }
+        }
+    @endphp
+
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <!-- Total Aset -->
@@ -33,7 +66,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-500 text-sm font-medium">Nilai Perolehan</p>
-                    <p class="text-2xl font-bold text-gray-900 mt-2">Rp {{ number_format($totalValue / 1000000, 1, ',', '.') }}M</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-2">Rp {{ format_rupiah_compact($totalValue) }}</p>
                 </div>
                 <div class="p-3 bg-emerald-100 rounded-xl">
                     <svg class="h-8 w-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -51,7 +84,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-500 text-sm font-medium">Nilai Saat Ini</p>
-                    <p class="text-2xl font-bold text-gray-900 mt-2">Rp {{ number_format($currentValue / 1000000, 1, ',', '.') }}M</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-2">Rp {{ format_rupiah_compact($currentValue) }}</p>
                 </div>
                 <div class="p-3 bg-amber-100 rounded-xl">
                     <svg class="h-8 w-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -129,13 +129,13 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div class="flex items-center justify-end gap-2">
-                                @can('update-maintenances')
+                                @can('manage-maintenances')
                                 <button wire:click="openUpdateModal({{ $maintenance->id }})" 
                                     class="text-blue-600 hover:text-blue-700 transition-colors font-medium">
                                     Update
                                 </button>
                                 @endcan
-                                @can('delete-maintenances')
+                                @can('manage-maintenances')
                                 <button wire:click="delete({{ $maintenance->id }})" 
                                     wire:confirm="Apakah Anda yakin ingin menghapus tiket ini?"
                                     class="text-red-600 hover:text-red-700 transition-colors font-medium">

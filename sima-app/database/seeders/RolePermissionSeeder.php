@@ -67,17 +67,17 @@ class RolePermissionSeeder extends Seeder
         ];
         
         foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+            Permission::firstOrCreate(['name' => $permission]);
         }
         
         // Create Roles and assign permissions
         
         // 1. Admin Aset - Full Access
-        $adminRole = Role::create(['name' => 'Admin Aset']);
+        $adminRole = Role::firstOrCreate(['name' => 'Admin Aset']);
         $adminRole->givePermissionTo(Permission::all());
         
         // 2. Pimpinan/Manajemen - View Only + Reports
-        $managerRole = Role::create(['name' => 'Pimpinan']);
+        $managerRole = Role::firstOrCreate(['name' => 'Pimpinan']);
         $managerRole->givePermissionTo([
             'view-dashboard',
             'view-assets',
@@ -89,16 +89,18 @@ class RolePermissionSeeder extends Seeder
         ]);
         
         // 3. Staff/Peminjam - Limited Access
-        $staffRole = Role::create(['name' => 'Staff']);
+        $staffRole = Role::firstOrCreate(['name' => 'Staff']);
         $staffRole->givePermissionTo([
             'view-dashboard',
             'view-assets',
+            'view-movements',
             'create-movements', // Request peminjaman
+            'view-maintenances',
             'create-maintenances', // Lapor kerusakan
         ]);
         
         // 4. Auditor - Stock Opname Access
-        $auditorRole = Role::create(['name' => 'Auditor']);
+        $auditorRole = Role::firstOrCreate(['name' => 'Auditor']);
         $auditorRole->givePermissionTo([
             'view-dashboard',
             'view-assets',
@@ -110,35 +112,31 @@ class RolePermissionSeeder extends Seeder
         // Create Default Users
         
         // Admin User
-        $admin = User::create([
-            'name' => 'Admin SIMA',
-            'email' => 'admin@sima.com',
-            'password' => Hash::make('password'),
-        ]);
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@sima.com'],
+            ['name' => 'Admin SIMA', 'password' => Hash::make('password')]
+        );
         $admin->assignRole('Admin Aset');
         
         // Manager User
-        $manager = User::create([
-            'name' => 'Manager',
-            'email' => 'manager@sima.com',
-            'password' => Hash::make('password'),
-        ]);
+        $manager = User::firstOrCreate(
+            ['email' => 'manager@sima.com'],
+            ['name' => 'Manager', 'password' => Hash::make('password')]
+        );
         $manager->assignRole('Pimpinan');
         
         // Staff User
-        $staff = User::create([
-            'name' => 'Staff User',
-            'email' => 'staff@sima.com',
-            'password' => Hash::make('password'),
-        ]);
+        $staff = User::firstOrCreate(
+            ['email' => 'staff@sima.com'],
+            ['name' => 'Staff User', 'password' => Hash::make('password')]
+        );
         $staff->assignRole('Staff');
         
         // Auditor User
-        $auditor = User::create([
-            'name' => 'Auditor',
-            'email' => 'auditor@sima.com',
-            'password' => Hash::make('password'),
-        ]);
+        $auditor = User::firstOrCreate(
+            ['email' => 'auditor@sima.com'],
+            ['name' => 'Auditor', 'password' => Hash::make('password')]
+        );
         $auditor->assignRole('Auditor');
     }
 }

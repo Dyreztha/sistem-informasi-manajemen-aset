@@ -10,6 +10,9 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 class Asset extends Model
 {
     use HasFactory, SoftDeletes;
+
+    // Depreciation settings
+    const USEFUL_LIFE_MONTHS = 48;
     
     protected $fillable = [
         'code', 'name', 'category_id', 'location_id', 'vendor_id',
@@ -70,8 +73,8 @@ class Asset extends Model
         });
         
         static::updating(function ($asset) {
-            // Recalculate if purchase_price or purchase_date or category changed
-            if ($asset->isDirty(['purchase_price', 'purchase_date', 'category_id'])) {
+            // Recalculate if purchase_price or purchase_date changed
+            if ($asset->isDirty(['purchase_price', 'purchase_date'])) {
                 $depreciation = $asset->calculateDepreciation();
                 $asset->depreciation_value = $depreciation;
                 $asset->current_value = max(0, $asset->purchase_price - $depreciation);
@@ -123,52 +126,20 @@ class Asset extends Model
     // Helper methods
     public function calculateDepreciation()
     {
-        if (!$this->purchase_date || !$this->category) {
+        if (!$this->purchase_date) {
             return 0;
         }
-        
-        // Calculate years owned (fractional)
-        $yearsOwned = $this->purchase_date->diffInMonths(now()) / 12;
-        
-        if ($yearsOwned <= 0) {
+
+        $monthsOwned = $this->purchase_date->startOfDay()->diffInMonths(now()->startOfDay());
+
+        if ($monthsOwned <= 0) {
             return 0;
         }
-        
-        $depreciationRate = $this->category->depreciation_rate ?? 0;
-        
-        if ($depreciationRate <= 0) {
-            return 0;
-        }
-        
-        if ($this->category->depreciation_method === 'straight_line') {
-            // Straight Line: (Purchase Price × Rate%) × Years
-            $annualDepreciation = ($this->purchase_price * $depreciationRate) / 100;
-            $totalDepreciation = $annualDepreciation * $yearsOwned;
-        } else { 
-            // Double Declining Balance
-            $rate = ($depreciationRate / 100) * 2;
-            $currentValue = $this->purchase_price;
-            $fullYears = floor($yearsOwned);
-            $partialYear = $yearsOwned - $fullYears;
-            
-            // Full years depreciation
-            for ($i = 0; $i < $fullYears; $i++) {
-                $currentValue -= ($currentValue * $rate);
-                if ($currentValue < 0) {
-                    $currentValue = 0;
-                    break;
-                }
-            }
-            
-            // Partial year depreciation
-            if ($partialYear > 0 && $currentValue > 0) {
-                $currentValue -= ($currentValue * $rate * $partialYear);
-            }
-            
-            $currentValue = max(0, $currentValue);
-            $totalDepreciation = $this->purchase_price - $currentValue;
-        }
-        
+
+        $monthsToDepreciate = min($monthsOwned, self::USEFUL_LIFE_MONTHS);
+        $monthlyDepreciation = $this->purchase_price / self::USEFUL_LIFE_MONTHS;
+        $totalDepreciation = $monthlyDepreciation * $monthsToDepreciate;
+
         // Depreciation cannot exceed purchase price
         return min($totalDepreciation, $this->purchase_price);
     }

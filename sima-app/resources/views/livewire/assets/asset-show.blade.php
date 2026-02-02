@@ -245,7 +245,7 @@
                             </span>
                         </div>
                         <p class="text-xs text-gray-500 mt-1">{{ Str::limit($maintenance->description, 50) }}</p>
-                        <p class="text-xs text-gray-500 mt-1">Biaya: Rp {{ number_format($maintenance->cost, 0, ',', '.') }}</p>
+                        <p class="text-xs text-gray-500 mt-1">Biaya: Rp {{ number_format($maintenance->actual_cost ?? $maintenance->estimated_cost ?? 0, 0, ',', '.') }}</p>
                     </div>
                     @endforeach
                 </div>

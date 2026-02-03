@@ -20,6 +20,8 @@ n# SIMA – Sistem Informasi Manajemen Aset
 	- `php artisan migrate:fresh --seed`
 7. Build asset frontend:
 	- `npm run build`
+8. Untuk scan QR nya:
+	- `npm install html5-qrcode`
 
 ## Menjalankan Aplikasi
 1. Jalankan server Laravel:

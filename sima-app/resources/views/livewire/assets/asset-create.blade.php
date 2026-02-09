@@ -161,9 +161,24 @@
                 <h3 class="text-lg font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-200">Dokumen Pendukung</h3>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Upload Dokumen (Faktur, Garansi, Foto)</label>
-                    <input type="file" wire:model="documents" multiple class="w-full text-sm text-gray-600 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-600 hover:file:translate-y-[-1px] hover:file:bg-blue-100 transition-colors">
+                    <input id="documents" name="documents" type="file" wire:model="documents" multiple class="w-full text-sm text-gray-600 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-600 hover:file:translate-y-[-1px] hover:file:bg-blue-100 transition-colors" accept="image/png, image/jpg, image/jpeg">
                     <p class="text-xs text-gray-500 mt-2">Maksimal 10MB per file</p>
                     @error('documents.*') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
+
+
+
+                    <div wire:loading wire:target="documents" class="flex items-center justify-center bg-neutral-secondary-soft h-20 w-20 border border-default text-fg-brand-strong text-xs font-medium rounded-base">
+                        <div class="px-2 py-px ring-1 mt-8 ring-inset ring-brand-subtle text-fg-brand-strong text-xs font-medium rounded-sm bg-brand-softer animate-pulse">loading...</div>
+                    </div>
+                @if ($documents)
+                    <div class="mt-3 flex gap-2 flex-wrap">
+                        @foreach ($documents as $doc)
+                            @if(str_contains($doc->getMimeType(), 'image'))
+                                <img src="{{ $doc->temporaryUrl() }}" class="w-20 h-20 object-cover rounded border">
+                            @endif
+                        @endforeach
+                    </div>
+                @endif
                 </div>
             </div>
 

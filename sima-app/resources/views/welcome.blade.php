@@ -55,9 +55,6 @@
                         <a href="{{ route('login') }}" class="px-8 py-4 bg-blue-600 hover:bg-blue-700 hover:scale-110 text-white rounded-xl font-semibold shadow-sm transition-transform duration-[0.4s]">
                             Mulai Sekarang
                         </a>
-                        <a href="#features" class="px-8 py-4 bg-white text-gray-700 rounded-xl hover:scale-110 font-semibold border border-gray-300 hover:bg-gray-100 transition-all duration-[0.4s]">
-                            Pelajari Lebih Lanjut
-                        </a>
                     </div>
                 </div>
             </div>

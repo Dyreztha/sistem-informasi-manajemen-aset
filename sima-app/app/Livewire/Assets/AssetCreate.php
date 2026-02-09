@@ -15,7 +15,7 @@ use Illuminate\Validation\Rule;
 class AssetCreate extends Component
 {
     use WithFileUploads;
-    
+
     public $name = '';
     public $category_id = '';
     public $location_id = '';
@@ -30,10 +30,15 @@ class AssetCreate extends Component
     public $status = 'tersedia';
     public $condition = 'baik';
     public $notes = '';
-    
+
     // Documents
     public $documents = [];
-    
+
+
+    public function updatedDocuments()
+{
+    $this->validateOnly('documents.*');
+}
     protected function rules()
     {
         return [
@@ -56,10 +61,11 @@ class AssetCreate extends Component
             'status' => 'required|in:tersedia,digunakan,maintenance,disposal',
             'condition' => 'required|in:baik,rusak_ringan,rusak_berat,hilang',
             'notes' => 'nullable|string',
-            'documents.*' => 'nullable|file|max:10240',
+            'documents.*' => 'nullable|file|mimes:jpg,jpeg,png|max:10240'
+
         ];
     }
-    
+
     protected $messages = [
         'name.required' => 'Nama aset harus diisi',
         'category_id.required' => 'Kategori harus dipilih',
@@ -69,12 +75,17 @@ class AssetCreate extends Component
         'serial_number.unique' => 'Nomor seri sudah terdaftar pada aset lain',
         'purchase_date.before_or_equal' => 'Tanggal beli tidak boleh di masa depan',
         'warranty_end_date.after_or_equal' => 'Tanggal garansi harus setelah tanggal beli',
+        'documents.*.file' => 'Dokumen harus berupa file yang valid',
+        'documents.*.max'  => 'Ukuran dokumen maksimal 10 MB',
+        'documents.*.mimes' => 'Dokumen hanya boleh berupa gambar (JPEG, JPG, PNG)',
+
     ];
-    
+
+
     public function save()
     {
         $this->validate();
-        
+
         // Additional validation for serial number (case-insensitive check)
         if ($this->serial_number) {
             $existingAsset = Asset::whereRaw('LOWER(serial_number) = ?', [strtolower($this->serial_number)])->first();
@@ -83,7 +94,7 @@ class AssetCreate extends Component
                 return;
             }
         }
-        
+
         $asset = Asset::create([
             'name' => $this->name,
             'category_id' => $this->category_id,
@@ -101,12 +112,12 @@ class AssetCreate extends Component
             'condition' => $this->condition,
             'notes' => $this->notes,
         ]);
-        
+
         // Upload documents
         if (!empty($this->documents)) {
             foreach ($this->documents as $document) {
                 $path = $document->store('asset-documents', 'public');
-                
+
                 AssetDocument::create([
                     'asset_id' => $asset->id,
                     'title' => $document->getClientOriginalName(),
@@ -119,12 +130,12 @@ class AssetCreate extends Component
                 ]);
             }
         }
-        
+
         session()->flash('message', 'Aset berhasil ditambahkan!');
-        
+
         return $this->redirect(route('assets.index'), navigate: true);
     }
-    
+
     public function render()
     {
         return view('livewire.assets.asset-create', [

@@ -1,4 +1,4 @@
-## SIMA – Sistem Informasi Manajemen Aset
+n# SIMA – Sistem Informasi Manajemen Aset
 
 ## Persyaratan
 - PHP 8.2+
@@ -32,5 +32,6 @@
 ## Akun Default (Seeder)
 Gunakan akun berikut setelah seeding:
 - Admin: admin@sima.com / password
+- Manager: manager@sima.com / password
 - Staff: staff@sima.com / password
 - Auditor: auditor@sima.com / password

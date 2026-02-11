@@ -16,6 +16,7 @@ use App\Livewire\StockOpnames\StockOpnameIndex;
 use App\Livewire\StockOpnames\StockOpnameCreate;
 use App\Livewire\StockOpnames\StockOpnameScan;
 use App\Http\Controllers\ReportController;
+use App\Livewire\Categories\CategoryCreate;
 
 Route::view('/', 'welcome');
 
@@ -29,7 +30,7 @@ Route::view('profile', 'profile')
 
 // Protected Routes
 Route::middleware(['auth'])->group(function () {
-    
+
     // Assets Routes
     Route::prefix('assets')->name('assets.')->group(function () {
         Route::get('/', AssetIndex::class)->name('index')->middleware('can:view-assets');
@@ -37,41 +38,43 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{asset}', AssetShow::class)->name('show')->middleware('can:view-assets');
         Route::get('/{asset}/edit', AssetEdit::class)->name('edit')->middleware('can:edit-assets');
     });
-    
+
     // Categories Routes
     Route::prefix('categories')->name('categories.')->group(function () {
         Route::get('/', CategoryIndex::class)->name('index')->middleware('can:view-categories');
+        Route::get('/create', CategoryCreate::class)->name('create')->middleware('can:create-categories');
     });
-    
+
     // Locations Routes
     Route::prefix('locations')->name('locations.')->group(function () {
         Route::get('/', LocationIndex::class)->name('index')->middleware('can:view-locations');
+        Route::get('/create', LocationIndex::class)->name('create')->middleware('can:create-locations');
     });
-    
+
     // Vendors Routes
     Route::prefix('vendors')->name('vendors.')->group(function () {
         Route::get('/', VendorIndex::class)->name('index')->middleware('can:view-vendors');
     });
-    
+
     // Movements Routes
     Route::prefix('movements')->name('movements.')->group(function () {
         Route::get('/', MovementIndex::class)->name('index')->middleware('can:view-movements');
         Route::get('/create', MovementCreate::class)->name('create')->middleware('can:create-movements');
     });
-    
+
     // Maintenances Routes
     Route::prefix('maintenances')->name('maintenances.')->group(function () {
         Route::get('/', MaintenanceIndex::class)->name('index')->middleware('can:view-maintenances');
         Route::get('/create', MaintenanceCreate::class)->name('create')->middleware('can:create-maintenances');
     });
-    
+
     // Stock Opnames Routes
     Route::prefix('stock-opnames')->name('stock-opnames.')->group(function () {
         Route::get('/', StockOpnameIndex::class)->name('index')->middleware('can:view-stock-opnames');
         Route::get('/create', StockOpnameCreate::class)->name('create')->middleware('can:create-stock-opnames');
         Route::get('/{stockOpname}/scan', StockOpnameScan::class)->name('scan')->middleware('can:scan-stock-opnames');
     });
-    
+
     // Reports Routes
     Route::prefix('reports')->name('reports.')->middleware('can:view-reports')->group(function () {
         Route::get('/assets/pdf', [ReportController::class, 'assetsPdf'])->name('assets.pdf');

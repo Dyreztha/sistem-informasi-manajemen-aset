@@ -6,31 +6,31 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'SIMA') }} - Sistem Informasi Manajemen Aset</title>
-        
+
         <link rel="icon" type="image/png" href="{{ asset('media/images/sima-icon.png') }}">
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-        
+
         <style>
             body { font-family: 'Inter', sans-serif; }
             .sidebar-link { transition: all 0.15s ease; }
             .sidebar-link:hover { background-color: #f3f4f6; }
             .sidebar-link.active { background-color: #eff6ff; color: #2563eb; border-right: 2px solid #2563eb; }
         </style>
-        
+
         @stack('styles')
     </head>
     <body class="font-sans antialiased bg-gray-50" x-data="{ sidebarOpen: false }">
         <div class="min-h-screen flex">
             <!-- Mobile Overlay -->
             <div x-show="sidebarOpen" @click="sidebarOpen = false" class="fixed inset-0 bg-gray-900/50 z-20 lg:hidden"></div>
-            
+
             <!-- Sidebar -->
             <aside class="fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-200 z-30 transform transition-transform lg:translate-x-0"
                    :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
-                
+
                 <!-- Logo -->
                 <div class="flex items-center h-16 px-6 border-b border-gray-200">
                     <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center space-x-3">
@@ -38,7 +38,7 @@
                         <span class="text-xl font-bold text-gray-900">SIMA</span>
                     </a>
                 </div>
-                
+
                 <!-- Navigation -->
                 <nav class="p-4 space-y-1 overflow-y-auto" style="height: calc(100vh - 140px);">
                     <a href="{{ route('dashboard') }}" wire:navigate
@@ -48,9 +48,9 @@
                         </svg>
                         Dashboard
                     </a>
-                    
+
                     <p class="px-3 pt-4 pb-2 text-xs font-semibold text-gray-400 uppercase">Master Data</p>
-                    
+
                     @can('view-assets')
                     <a href="{{ route('assets.index') }}" wire:navigate
                        class="sidebar-link flex items-center px-3 py-2.5 text-sm font-medium rounded-lg {{ request()->routeIs('assets.*') ? 'active' : 'text-gray-700' }}">
@@ -60,7 +60,7 @@
                         Aset
                     </a>
                     @endcan
-                    
+
                     @can('view-categories')
                     <a href="{{ route('categories.index') }}" wire:navigate
                        class="sidebar-link flex items-center px-3 py-2.5 text-sm font-medium rounded-lg {{ request()->routeIs('categories.*') ? 'active' : 'text-gray-700' }}">
@@ -70,7 +70,7 @@
                         Kategori
                     </a>
                     @endcan
-                    
+
                     @can('view-locations')
                     <a href="{{ route('locations.index') }}" wire:navigate
                        class="sidebar-link flex items-center px-3 py-2.5 text-sm font-medium rounded-lg {{ request()->routeIs('locations.*') ? 'active' : 'text-gray-700' }}">
@@ -81,7 +81,7 @@
                         Lokasi
                     </a>
                     @endcan
-                    
+
                     @can('view-vendors')
                     <a href="{{ route('vendors.index') }}" wire:navigate
                        class="sidebar-link flex items-center px-3 py-2.5 text-sm font-medium rounded-lg {{ request()->routeIs('vendors.*') ? 'active' : 'text-gray-700' }}">
@@ -91,9 +91,9 @@
                         Vendor
                     </a>
                     @endcan
-                    
+
                     <p class="px-3 pt-4 pb-2 text-xs font-semibold text-gray-400 uppercase">Transaksi</p>
-                    
+
                     @can('view-movements')
                     <a href="{{ route('movements.index') }}" wire:navigate
                        class="sidebar-link flex items-center px-3 py-2.5 text-sm font-medium rounded-lg {{ request()->routeIs('movements.*') ? 'active' : 'text-gray-700' }}">
@@ -103,7 +103,7 @@
                         Sirkulasi
                     </a>
                     @endcan
-                    
+
                     @can('view-maintenances')
                     <a href="{{ route('maintenances.index') }}" wire:navigate
                        class="sidebar-link flex items-center px-3 py-2.5 text-sm font-medium rounded-lg {{ request()->routeIs('maintenances.*') ? 'active' : 'text-gray-700' }}">
@@ -114,7 +114,7 @@
                         Pemeliharaan
                     </a>
                     @endcan
-                    
+
                     @can('view-stock-opnames')
                     <a href="{{ route('stock-opnames.index') }}" wire:navigate
                        class="sidebar-link flex items-center px-3 py-2.5 text-sm font-medium rounded-lg {{ request()->routeIs('stock-opnames.*') ? 'active' : 'text-gray-700' }}">
@@ -125,7 +125,7 @@
                     </a>
                     @endcan
                 </nav>
-                
+
                 <!-- User Info -->
                 <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-white">
                     <div class="flex items-center space-x-3">
@@ -139,7 +139,7 @@
                     </div>
                 </div>
             </aside>
-            
+
             <!-- Main Content -->
             <div class="flex-1 lg:ml-64">
                 <!-- Header -->
@@ -150,20 +150,20 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/>
                             </svg>
                         </button>
-                        
+
                         @if (isset($header))
                             <h1 class="hidden lg:block text-lg font-semibold text-gray-900">{{ $header }}</h1>
                         @else
                             <div></div>
                         @endif
-                        
+
                         <div class="flex items-center space-x-3">
                             <button class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 relative">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                                 </svg>
                             </button>
-                            
+
                             <div x-data="{ open: false }" class="relative">
                                 <button @click="open = !open" class="flex items-center space-x-2 p-2 rounded-lg text-gray-700 hover:bg-gray-100">
                                     <span class="hidden sm:block text-sm font-medium">{{ auth()->user()->name ?? 'User' }}</span>
@@ -171,7 +171,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 9l-7 7-7-7"/>
                                     </svg>
                                 </button>
-                                
+
                                 <div x-show="open" @click.away="open = false" x-transition
                                      class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
                                     <a href="{{ route('profile') }}" wire:navigate class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
@@ -199,13 +199,13 @@
                 <main class="p-4 lg:p-8">
                     {{ $slot }}
                 </main>
-                
+
                 <footer class="border-t border-gray-200 px-4 lg:px-8 py-4">
                     <p class="text-center text-sm text-gray-500">&copy; {{ date('Y') }} SIMA - Sistem Informasi Manajemen Aset</p>
                 </footer>
             </div>
         </div>
-        
+
         @stack('scripts')
     </body>
 </html>

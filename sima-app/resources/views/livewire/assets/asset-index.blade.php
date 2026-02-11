@@ -20,6 +20,8 @@
         @endcan
     </div>
 
+
+
     <!-- Flash Message -->
     @if (session()->has('message'))
         <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl flex items-center" role="alert">

@@ -6,14 +6,22 @@
             <p class="text-sm text-gray-500 mt-1">Kelola kategori aset dan pengaturan depresiasi</p>
         </div>
         @can('create-categories')
-        <button wire:click="openCreateModal"
-            class="inline-flex items-center px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold shadow-sm transition-all duration-300">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-            </svg>
-            Tambah Kategori
-        </button>
-        @endcan
+<button
+    type="button"
+    wire:click="openCreateModal"
+    class="mt-4 sm:mt-0 inline-flex items-center px-4 py-2.5
+           bg-blue-600 hover:bg-blue-700 rounded-xl
+           font-semibold text-sm text-white shadow-sm
+           transition-all hover:scale-[1.01]">
+
+    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 4v16m8-8H4"/>
+    </svg>
+
+    Tambah Kategori
+</button>
+@endcan
     </div>
 
     @if (session()->has('message'))
@@ -75,12 +83,17 @@
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
                             @can('edit-categories')
                             <button wire:click="openEditModal({{ $category->id }})" class="text-blue-600 hover:text-blue-700 mr-3 font-medium transition-colors">
-                                Edit
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
                             </button>
+
                             @endcan
                             @can('delete-categories')
                             <button wire:click="confirmDelete({{ $category->id }})" class="text-red-600 hover:text-red-700 font-medium transition-colors">
-                                Hapus
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
                             </button>
                             @endcan
                         </td>
@@ -103,6 +116,86 @@
             {{ $categories->links() }}
         </div>
     </div>
+
+
+    {{-- showCreateModal --}}
+   <!-- Create Modal -->
+@if($showModal)
+<div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm overflow-y-auto h-full w-full z-50"
+     wire:click.self="$set('showModal', false)">
+
+    <div class="relative top-20 mx-auto p-6 border border-gray-200 w-full max-w-md shadow-xl rounded-2xl bg-white">
+
+        <h3 class="text-xl font-bold text-gray-900 mb-6">
+            Tambah Kategori Baru
+        </h3>
+
+        <form wire:submit="save">
+            <div class="space-y-4">
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Kode</label>
+                    <input type="text" wire:model="code"
+                        class="w-full bg-white border-gray-300 text-gray-900 rounded-xl focus:border-blue-500 focus:ring-blue-500">
+                    @error('code') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nama</label>
+                    <input type="text" wire:model="name"
+                        class="w-full bg-white border-gray-300 text-gray-900 rounded-xl focus:border-blue-500 focus:ring-blue-500">
+                    @error('name') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Deskripsi</label>
+                    <textarea wire:model="description" rows="2"
+                        class="w-full bg-white border-gray-300 text-gray-900 rounded-xl focus:border-blue-500 focus:ring-blue-500"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Rate Depresiasi (%)</label>
+                        <input type="number" wire:model="depreciation_rate" min="0" max="100" step="0.01"
+                            class="w-full bg-white border-gray-300 text-gray-900 rounded-xl focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Masa Pakai (Tahun)</label>
+                        <input type="number" wire:model="useful_life_years" min="1"
+                            class="w-full bg-white border-gray-300 text-gray-900 rounded-xl focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Metode Depresiasi</label>
+                    <select wire:model="depreciation_method"
+                        class="w-full bg-white border-gray-300 text-gray-900 rounded-xl focus:border-blue-500 focus:ring-blue-500">
+                        <option value="straight_line">Garis Lurus (Straight Line)</option>
+                        <option value="declining_balance">Saldo Menurun (Declining Balance)</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="mt-6 flex justify-end gap-3">
+                <button type="button"
+                    wire:click="$set('showModal', false)"
+                    class="px-5 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-xl font-medium">
+                    Batal
+                </button>
+
+                <button type="submit"
+                    class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold shadow-sm">
+                    Simpan
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+@endif
+
 
     <!-- Modal Form -->
     @if($showModal)

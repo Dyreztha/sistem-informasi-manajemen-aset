@@ -18,64 +18,72 @@ class RolePermissionSeeder extends Seeder
     {
         // Reset cached roles and permissions
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
-        
+
         // Create Permissions
         $permissions = [
             // Dashboard
             'view-dashboard',
-            
+
             // Assets
             'view-assets',
             'create-assets',
             'edit-assets',
             'delete-assets',
             'generate-qr',
-            
+
             // Categories
             'view-categories',
-            'manage-categories',
-            
+            'create-categories',
+            'edit-categories',
+            'delete-categories',
+            // 'manage-categories',
+
+
             // Locations
             'view-locations',
-            'manage-locations',
-            
+            'create-locations',
+            'edit-locations',
+            'delete-locations',
+
             // Vendors
             'view-vendors',
-            'manage-vendors',
-            
+            'create-vendors',
+            'edit-vendors',
+            'delete-vendors',
+
             // Movements
             'view-movements',
             'create-movements',
             'approve-movements',
-            
+
             // Maintenance
             'view-maintenances',
             'create-maintenances',
             'manage-maintenances',
-            
+
             // Stock Opname
             'view-stock-opnames',
             'create-stock-opnames',
             'scan-stock-opnames',
-            
+
             // Reports
             'view-reports',
             'export-reports',
-            
+
             // Users
             'manage-users',
         ];
-        
+
         foreach ($permissions as $permission) {
             Permission::firstOrCreate(['name' => $permission]);
         }
-        
+
         // Create Roles and assign permissions
-        
+
         // 1. Admin Aset - Full Access
         $adminRole = Role::firstOrCreate(['name' => 'Admin Aset']);
         $adminRole->givePermissionTo(Permission::all());
-        
+
         // 2. Pimpinan/Manajemen - View Only + Reports
         $managerRole = Role::firstOrCreate(['name' => 'Pimpinan']);
         $managerRole->givePermissionTo([
@@ -87,7 +95,7 @@ class RolePermissionSeeder extends Seeder
             'view-reports',
             'export-reports',
         ]);
-        
+
         // 3. Staff/Peminjam - Limited Access
         $staffRole = Role::firstOrCreate(['name' => 'Staff']);
         $staffRole->givePermissionTo([
@@ -98,7 +106,7 @@ class RolePermissionSeeder extends Seeder
             'view-maintenances',
             'create-maintenances', // Lapor kerusakan
         ]);
-        
+
         // 4. Auditor - Stock Opname Access
         $auditorRole = Role::firstOrCreate(['name' => 'Auditor']);
         $auditorRole->givePermissionTo([
@@ -108,30 +116,30 @@ class RolePermissionSeeder extends Seeder
             'create-stock-opnames',
             'scan-stock-opnames',
         ]);
-        
+
         // Create Default Users
-        
+
         // Admin User
         $admin = User::firstOrCreate(
             ['email' => 'admin@sima.com'],
             ['name' => 'Admin SIMA', 'password' => Hash::make('password')]
         );
         $admin->assignRole('Admin Aset');
-        
+
         // Manager User
         $manager = User::firstOrCreate(
             ['email' => 'manager@sima.com'],
             ['name' => 'Manager', 'password' => Hash::make('password')]
         );
         $manager->assignRole('Pimpinan');
-        
+
         // Staff User
         $staff = User::firstOrCreate(
             ['email' => 'staff@sima.com'],
             ['name' => 'Staff User', 'password' => Hash::make('password')]
         );
         $staff->assignRole('Staff');
-        
+
         // Auditor User
         $auditor = User::firstOrCreate(
             ['email' => 'auditor@sima.com'],

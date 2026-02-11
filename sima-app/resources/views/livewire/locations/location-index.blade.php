@@ -6,7 +6,7 @@
             <p class="text-gray-500 mt-1">Kelola lokasi dan penempatan aset</p>
         </div>
         @can('create-locations')
-        <button wire:click="openCreateModal" 
+        <button wire:click="openCreateModal"
             class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl shadow-sm transition-all duration-200">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -95,21 +95,19 @@
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div class="flex items-center justify-end gap-2">
                                 @can('edit-locations')
-                                <button wire:click="openEditModal({{ $location->id }})" 
+                                <button wire:click="openEditModal({{ $location->id }})"
                                     class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm rounded-xl transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                    </svg>
-                                    Edit
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
                                 </button>
                                 @endcan
                                 @can('delete-locations')
-                                <button wire:click="confirmDelete({{ $location->id }})" 
+                                <button wire:click="confirmDelete({{ $location->id }})"
                                     class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm rounded-xl transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                    </svg>
-                                    Hapus
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
                                 </button>
                                 @endcan
                             </div>
@@ -159,13 +157,13 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Kode</label>
-                                <input type="text" wire:model="code" 
+                                <input type="text" wire:model="code"
                                     class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors">
                                 @error('code') <span class="text-red-600 text-sm mt-1 block">{{ $message }}</span> @enderror
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Nama</label>
-                                <input type="text" wire:model="name" 
+                                <input type="text" wire:model="name"
                                     class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors">
                                 @error('name') <span class="text-red-600 text-sm mt-1 block">{{ $message }}</span> @enderror
                             </div>
@@ -183,20 +181,20 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Gedung</label>
-                            <input type="text" wire:model="building" 
+                            <input type="text" wire:model="building"
                                 class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors">
                             @error('building') <span class="text-red-600 text-sm mt-1 block">{{ $message }}</span> @enderror
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Lantai</label>
-                                <input type="text" wire:model="floor" 
+                                <input type="text" wire:model="floor"
                                     class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors">
                                 @error('floor') <span class="text-red-600 text-sm mt-1 block">{{ $message }}</span> @enderror
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Ruangan</label>
-                                <input type="text" wire:model="room" 
+                                <input type="text" wire:model="room"
                                     class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-900 placeholder-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-colors">
                                 @error('room') <span class="text-red-600 text-sm mt-1 block">{{ $message }}</span> @enderror
                             </div>

@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Vendors;
 
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Vendor;
 
+#[Layout('layouts.app')]
 class VendorIndex extends Component
 {
     use WithPagination;
@@ -130,6 +132,6 @@ class VendorIndex extends Component
             
         return view('livewire.vendors.vendor-index', [
             'vendors' => $vendors,
-        ])->layout('layouts.app');
+        ]);
     }
 }

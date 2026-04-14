@@ -235,7 +235,7 @@
 
             <!-- Buttons -->
             <div class="flex justify-end space-x-4 pt-4">
-                <a href="{{ route('assets.show', $asset) }}" wire:navigate
+                <a href="{{ route('assets.index', $asset) }}" wire:navigate
                     class="px-6 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-xl font-medium transition-colors hover:translate-y-[-1px]">
                     Batal
                 </a>

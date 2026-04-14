@@ -16,7 +16,7 @@ use App\Livewire\StockOpnames\StockOpnameIndex;
 use App\Livewire\StockOpnames\StockOpnameCreate;
 use App\Livewire\StockOpnames\StockOpnameScan;
 use App\Http\Controllers\ReportController;
-use App\Livewire\Categories\CategoryCreate;
+
 
 Route::view('/', 'welcome');
 
@@ -37,12 +37,14 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/create', AssetCreate::class)->name('create')->middleware('can:create-assets');
         Route::get('/{asset}', AssetShow::class)->name('show')->middleware('can:view-assets');
         Route::get('/{asset}/edit', AssetEdit::class)->name('edit')->middleware('can:edit-assets');
+        Route::get('/{asset}/print-qr', [ReportController::class, 'printAssetQr'])->name('print-qr')->middleware('can:view-assets');
+        Route::get('/{asset}/download-qr', [ReportController::class, 'downloadAssetQr'])->name('download-qr')->middleware('can:view-assets');
     });
 
     // Categories Routes
     Route::prefix('categories')->name('categories.')->group(function () {
         Route::get('/', CategoryIndex::class)->name('index')->middleware('can:view-categories');
-        Route::get('/create', CategoryCreate::class)->name('create')->middleware('can:create-categories');
+        Route::get('/create', CategoryIndex::class)->name('create')->middleware('can:create-categories');
     });
 
     // Locations Routes

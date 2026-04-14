@@ -20,7 +20,8 @@ new #[Layout('layouts.guest')] class extends Component
 
         Session::regenerate();
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        // $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        $this->dispatch('login-success');
     }
 }; ?>
 
@@ -28,9 +29,13 @@ new #[Layout('layouts.guest')] class extends Component
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <form wire:submit="login" class="space-y-6">
+    <form  x-data="{ loading: false }" wire:submit="login"  @login-success.window="
+        loading = true;
+        setTimeout(() => window.location.href = '{{ route('dashboard') }}', 400);
+    " class="space-y-6">
+
         <!-- Email Address -->
-        <div>
+        <div :class="clicked ? 'animate-fadeputrightlogin' : ''">
             <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
             <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -48,7 +53,7 @@ new #[Layout('layouts.guest')] class extends Component
         </div>
 
         <!-- Password -->
-        <div>
+        <div :class="clicked ? 'animate-fadeputleftlogin' : ''">
             <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
             <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -66,22 +71,25 @@ new #[Layout('layouts.guest')] class extends Component
         </div>
 
         <!-- Remember Me & Forgot Password -->
-        <div class="flex items-center justify-between">
-            <label for="remember" class="inline-flex items-center cursor-pointer">
+        <div  class="flex items-center justify-between">
+            <label :class="clicked ? 'animate-fadeputleftlogin' : ''" for="remember" class="inline-flex items-center cursor-pointer">
                 <input wire:model="form.remember" id="remember" type="checkbox" name="remember"
                        class="w-4 h-4 rounded border-gray-300 bg-white text-blue-600 focus:ring-blue-500 focus:ring-offset-white">
                 <span class="ml-2 text-sm text-gray-600">Ingat saya</span>
             </label>
 
             @if (Route::has('password.request'))
-                <a class="text-sm text-blue-600 hover:text-blue-700 transition-colors" href="{{ route('password.request') }}" wire:navigate>
+                <a :class="clicked ? 'animate-fadeputrightlogin' : ''" class="text-sm text-blue-600 hover:text-blue-700 transition-colors" href="{{ route('password.request') }}" wire:navigate>
                     Lupa password?
                 </a>
             @endif
         </div>
 
         <!-- Submit Button -->
-        <button type="submit"
+        <button  type="submit"
+        :class="loading
+        ? 'animate-fadeputleftlogin pointer-events-none opacity-100'
+        : ''"
                 class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-sm transition-all duration-200 flex items-center justify-center space-x-2">
             <span wire:loading.remove wire:target="login">Masuk</span>
             <svg wire:loading wire:target="login" class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">

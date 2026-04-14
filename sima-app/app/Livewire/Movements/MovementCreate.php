@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Movements;
 
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use App\Models\Asset;
 use App\Models\AssetMovement;
@@ -9,6 +10,7 @@ use App\Models\Location;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
+#[Layout('layouts.app')]
 class MovementCreate extends Component
 {
     public $type = 'peminjaman';
@@ -217,6 +219,6 @@ class MovementCreate extends Component
             'assets' => $assets,
             'users' => $users,
             'locations' => $locations,
-        ])->layout('layouts.app');
+        ]);
     }
 }

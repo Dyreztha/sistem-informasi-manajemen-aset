@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Categories;
 
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Category;
 
+#[Layout('layouts.app')]
 class CategoryIndex extends Component
 {
     use WithPagination;
@@ -128,6 +130,6 @@ class CategoryIndex extends Component
 
         return view('livewire.categories.category-index', [
             'categories' => $categories,
-        ])->layout('layouts.app');
+        ]);
     }
 }

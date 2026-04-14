@@ -21,21 +21,21 @@ class ReportController extends Controller
             ->when($request->condition, fn($q) => $q->where('condition', $request->condition))
             ->orderBy('code')
             ->get();
-        
+
         $pdf = Pdf::loadView('reports.assets-pdf', [
             'assets' => $assets,
             'title' => 'Laporan Daftar Aset',
             'date' => now()->format('d F Y'),
         ]);
-        
+
         return $pdf->download('laporan-aset-' . now()->format('Y-m-d') . '.pdf');
     }
-    
+
     public function assetsExcel(Request $request)
     {
         return Excel::download(new AssetsExport($request), 'laporan-aset-' . now()->format('Y-m-d') . '.xlsx');
     }
-    
+
     public function movementsPdf(Request $request)
     {
         $movements = AssetMovement::with(['asset', 'fromUser', 'toUser', 'fromLocation', 'toLocation'])
@@ -45,16 +45,16 @@ class ReportController extends Controller
             ->when($request->end_date, fn($q) => $q->whereDate('movement_date', '<=', $request->end_date))
             ->orderBy('movement_date', 'desc')
             ->get();
-        
+
         $pdf = Pdf::loadView('reports.movements-pdf', [
             'movements' => $movements,
             'title' => 'Laporan Sirkulasi Aset',
             'date' => now()->format('d F Y'),
         ]);
-        
+
         return $pdf->download('laporan-sirkulasi-' . now()->format('Y-m-d') . '.pdf');
     }
-    
+
     public function maintenancesPdf(Request $request)
     {
         $maintenances = Maintenance::with(['asset', 'requestedBy', 'assignedTo'])
@@ -64,41 +64,41 @@ class ReportController extends Controller
             ->when($request->end_date, fn($q) => $q->whereDate('created_at', '<=', $request->end_date))
             ->orderBy('created_at', 'desc')
             ->get();
-        
+
         $pdf = Pdf::loadView('reports.maintenances-pdf', [
             'maintenances' => $maintenances,
             'title' => 'Laporan Pemeliharaan',
             'date' => now()->format('d F Y'),
             'totalCost' => $maintenances->sum('actual_cost'),
         ]);
-        
+
         return $pdf->download('laporan-pemeliharaan-' . now()->format('Y-m-d') . '.pdf');
     }
-    
+
     public function stockOpnamePdf(StockOpname $stockOpname)
     {
         $stockOpname->load(['location', 'conductedBy', 'details.asset']);
-        
+
         $pdf = Pdf::loadView('reports.stock-opname-pdf', [
             'stockOpname' => $stockOpname,
             'title' => 'Laporan Stock Opname',
             'date' => now()->format('d F Y'),
         ]);
-        
+
         return $pdf->download('stock-opname-' . $stockOpname->opname_number . '.pdf');
     }
-    
+
     public function assetQrPdf(Asset $asset)
     {
         $qrCode = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')
             ->size(200)
             ->generate($asset->code);
-        
+
         $pdf = Pdf::loadView('reports.asset-qr-pdf', [
             'asset' => $asset,
             'qrCode' => base64_encode($qrCode),
         ]);
-        
+
         return $pdf->download('qr-' . $asset->code . '.pdf');
     }
 }

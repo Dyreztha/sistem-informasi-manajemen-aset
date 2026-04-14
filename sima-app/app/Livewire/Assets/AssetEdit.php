@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Assets;
 
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\Asset;
@@ -13,12 +14,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
+#[Layout('layouts.app')]
+
 class AssetEdit extends Component
 {
     use WithFileUploads;
-    
+
     public Asset $asset;
-    
+
     public $name = '';
     public $category_id = '';
     public $location_id = '';
@@ -33,9 +36,9 @@ class AssetEdit extends Component
     public $status = 'tersedia';
     public $condition = 'baik';
     public $notes = '';
-    
+
     public $documents = [];
-    
+
     protected function rules()
     {
         return [
@@ -63,12 +66,12 @@ class AssetEdit extends Component
             'documents.*' => 'nullable|file|max:10240',
         ];
     }
-    
+
     protected $messages = [
         'serial_number.unique' => 'Nomor seri sudah terdaftar pada aset lain',
         'purchase_date.before_or_equal' => 'Tanggal beli tidak boleh di masa depan',
     ];
-    
+
     public function mount(Asset $asset)
     {
         $this->asset = $asset;
@@ -87,26 +90,26 @@ class AssetEdit extends Component
         $this->condition = $asset->condition;
         $this->notes = $asset->notes;
     }
-    
+
     public function save()
     {
         $this->validate();
-        
+
         // Check for status change restrictions
         $originalStatus = $this->asset->getOriginal('status');
-        
+
         // Cannot change status if asset has active movement
         if ($this->status !== $originalStatus && $this->asset->hasActiveMovement()) {
             $this->addError('status', 'Tidak dapat mengubah status karena ada transaksi sirkulasi aktif.');
             return;
         }
-        
+
         // Cannot change status if asset has active maintenance (except to maintenance)
         if ($this->status !== $originalStatus && $this->status !== 'maintenance' && $this->asset->hasActiveMaintenance()) {
             $this->addError('status', 'Tidak dapat mengubah status karena ada tiket pemeliharaan aktif.');
             return;
         }
-        
+
         // Additional validation for serial number (case-insensitive check)
         if ($this->serial_number) {
             $existingAsset = Asset::where('id', '!=', $this->asset->id)
@@ -117,7 +120,7 @@ class AssetEdit extends Component
                 return;
             }
         }
-        
+
         // Clear assigned_to if changing to tersedia
         $updateData = [
             'name' => $this->name,
@@ -135,20 +138,20 @@ class AssetEdit extends Component
             'condition' => $this->condition,
             'notes' => $this->notes,
         ];
-        
+
         // If status changes to tersedia, clear assignment
         if ($this->status === 'tersedia' && $originalStatus !== 'tersedia') {
             $updateData['assigned_to'] = null;
             $updateData['assigned_date'] = null;
         }
-        
+
         $this->asset->update($updateData);
-        
+
         // Upload new documents
         if (!empty($this->documents)) {
             foreach ($this->documents as $document) {
                 $path = $document->store('asset-documents', 'public');
-                
+
                 AssetDocument::create([
                     'asset_id' => $this->asset->id,
                     'title' => $document->getClientOriginalName(),
@@ -161,12 +164,12 @@ class AssetEdit extends Component
                 ]);
             }
         }
-        
+
         session()->flash('message', 'Aset berhasil diperbarui!');
-        
-        return $this->redirect(route('assets.show', $this->asset), navigate: true);
+
+        return $this->redirect(route('assets.index', $this->asset), navigate: true);
     }
-    
+
     public function deleteDocument($documentId)
     {
         $doc = AssetDocument::find($documentId);
@@ -175,7 +178,7 @@ class AssetEdit extends Component
             $doc->delete();
         }
     }
-    
+
     public function render()
     {
         return view('livewire.assets.asset-edit', [
@@ -183,6 +186,6 @@ class AssetEdit extends Component
             'locations' => Location::orderBy('name')->get(),
             'vendors' => Vendor::orderBy('name')->get(),
             'existingDocuments' => $this->asset->documents,
-        ])->layout('layouts.app');
+        ]);
     }
 }

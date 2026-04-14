@@ -2,10 +2,12 @@
 
 namespace App\Livewire\StockOpnames;
 
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\StockOpname;
 
+#[Layout('layouts.app')]
 class StockOpnameIndex extends Component
 {
     use WithPagination;
@@ -57,6 +59,6 @@ class StockOpnameIndex extends Component
             
         return view('livewire.stock-opnames.stock-opname-index', [
             'stockOpnames' => $stockOpnames,
-        ])->layout('layouts.app');
+        ]);
     }
 }

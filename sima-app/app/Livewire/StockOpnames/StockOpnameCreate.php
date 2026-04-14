@@ -2,11 +2,13 @@
 
 namespace App\Livewire\StockOpnames;
 
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use App\Models\StockOpname;
 use App\Models\Location;
 use Illuminate\Support\Facades\Auth;
 
+#[Layout('layouts.app')]
 class StockOpnameCreate extends Component
 {
     public $title = '';
@@ -52,6 +54,6 @@ class StockOpnameCreate extends Component
         
         return view('livewire.stock-opnames.stock-opname-create', [
             'locations' => $locations,
-        ])->layout('layouts.app');
+        ]);
     }
 }

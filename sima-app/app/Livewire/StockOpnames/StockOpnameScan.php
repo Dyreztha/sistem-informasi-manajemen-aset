@@ -2,12 +2,14 @@
 
 namespace App\Livewire\StockOpnames;
 
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use App\Models\StockOpname;
 use App\Models\StockOpnameDetail;
 use App\Models\Asset;
 use Illuminate\Support\Facades\Auth;
 
+#[Layout('layouts.app')]
 class StockOpnameScan extends Component
 {
     public StockOpname $stockOpname;
@@ -155,7 +157,7 @@ class StockOpnameScan extends Component
                     'actual_location_id' => null,
                     'expected_condition' => $asset->condition,
                     'actual_condition' => null,
-                    'status' => 'missing',
+                    'status' => 'not_found',
                     'scanned_by' => Auth::id(),
                     'scanned_at' => now(),
                 ]);
@@ -203,6 +205,6 @@ class StockOpnameScan extends Component
             'scannedAssets' => $scannedAssets,
             'scannedCount' => $scannedCount,
             'totalAssets' => $totalAssets,
-        ])->layout('layouts.app');
+        ]);
     }
 }

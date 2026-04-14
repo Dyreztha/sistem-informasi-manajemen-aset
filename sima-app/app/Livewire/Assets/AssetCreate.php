@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Assets;
 
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\Asset;
@@ -10,8 +11,10 @@ use App\Models\Location;
 use App\Models\Vendor;
 use App\Models\AssetDocument;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
+#[Layout('layouts.app')]
 class AssetCreate extends Component
 {
     use WithFileUploads;
@@ -31,14 +34,10 @@ class AssetCreate extends Component
     public $condition = 'baik';
     public $notes = '';
 
-    // Documents
     public $documents = [];
+    public $documentPreviews = [];
 
-
-    public function updatedDocuments()
-{
-    $this->validateOnly('documents.*');
-}
+    // ================= VALIDATION =================
     protected function rules()
     {
         return [
@@ -60,80 +59,123 @@ class AssetCreate extends Component
             'warranty_end_date' => 'nullable|date|after_or_equal:purchase_date',
             'status' => 'required|in:tersedia,digunakan,maintenance,disposal',
             'condition' => 'required|in:baik,rusak_ringan,rusak_berat,hilang',
-            'notes' => 'nullable|string',
-            'documents.*' => 'nullable|file|mimes:jpg,jpeg,png|max:10240'
 
+            // 🔥 pindahin validasi dokumen ke sini biar gak double
+            'documents.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx|max:10240',
         ];
     }
 
-    protected $messages = [
-        'name.required' => 'Nama aset harus diisi',
-        'category_id.required' => 'Kategori harus dipilih',
-        'purchase_price.required' => 'Harga perolehan harus diisi',
-        'purchase_price.numeric' => 'Harga harus berupa angka',
-        'purchase_price.min' => 'Harga tidak boleh negatif',
-        'serial_number.unique' => 'Nomor seri sudah terdaftar pada aset lain',
-        'purchase_date.before_or_equal' => 'Tanggal beli tidak boleh di masa depan',
-        'warranty_end_date.after_or_equal' => 'Tanggal garansi harus setelah tanggal beli',
-        'documents.*.file' => 'Dokumen harus berupa file yang valid',
-        'documents.*.max'  => 'Ukuran dokumen maksimal 10 MB',
-        'documents.*.mimes' => 'Dokumen hanya boleh berupa gambar (JPEG, JPG, PNG)',
+    // ================= PREVIEW =================
+    public function updatedDocuments()
+    {
+        $this->validateOnly('documents.*');
+        $this->generateDocumentPreviews();
+    }
 
-    ];
+    private function generateDocumentPreviews()
+    {
+        $this->documentPreviews = [];
 
+        foreach ($this->documents as $key => $file) {
+            $this->documentPreviews[$key] = [
+                'name' => $file->getClientOriginalName(),
+                'size' => $this->formatBytes($file->getSize()),
+                'type' => $file->getMimeType(),
 
+                // 🔥 FIX: pakai temporaryUrl (lebih ringan & gak pecah)
+                'url' => $file->temporaryUrl(),
+            ];
+        }
+    }
+
+    private function formatBytes($bytes, $precision = 2)
+    {
+        $units = ['B', 'KB', 'MB', 'GB'];
+        $pow = floor(log($bytes ?: 1, 1024));
+        $pow = min($pow, count($units) - 1);
+        return round($bytes / (1024 ** $pow), $precision) . ' ' . $units[$pow];
+    }
+
+    public function deleteDocument($key)
+    {
+        unset($this->documents[$key]);
+        $this->documents = array_values($this->documents);
+        $this->generateDocumentPreviews();
+    }
+
+    // ================= SAVE =================
     public function save()
     {
+        Log::info('Asset save started');
+
+        // VALIDASI
         $this->validate();
 
-        // Additional validation for serial number (case-insensitive check)
+        // 🔥 FIX: cek serial number (case insensitive + ignore soft delete)
         if ($this->serial_number) {
-            $existingAsset = Asset::whereRaw('LOWER(serial_number) = ?', [strtolower($this->serial_number)])->first();
-            if ($existingAsset) {
-                $this->addError('serial_number', "Nomor seri sudah terdaftar pada aset {$existingAsset->code} ({$existingAsset->name})");
+            $exists = Asset::whereRaw('LOWER(serial_number) = ?', [strtolower($this->serial_number)])
+                ->whereNull('deleted_at')
+                ->exists();
+
+            if ($exists) {
+                $this->addError('serial_number', 'Nomor seri sudah terdaftar');
                 return;
             }
         }
 
-        $asset = Asset::create([
-            'name' => $this->name,
-            'category_id' => $this->category_id,
-            'location_id' => $this->location_id ?: null,
-            'vendor_id' => $this->vendor_id ?: null,
-            'brand' => $this->brand,
-            'model' => $this->model,
-            'serial_number' => $this->serial_number ?: null,
-            'description' => $this->description,
-            'purchase_price' => $this->purchase_price,
-            'current_value' => $this->purchase_price,
-            'purchase_date' => $this->purchase_date ?: null,
-            'warranty_end_date' => $this->warranty_end_date ?: null,
-            'status' => $this->status,
-            'condition' => $this->condition,
-            'notes' => $this->notes,
-        ]);
+        try {
+            // CREATE ASSET
+            $asset = Asset::create([
+                'name' => $this->name,
+                'category_id' => $this->category_id,
+                'location_id' => $this->location_id ?: null,
+                'vendor_id' => $this->vendor_id ?: null,
+                'brand' => $this->brand,
+                'model' => $this->model,
+                'serial_number' => $this->serial_number ?: null,
+                'description' => $this->description,
+                'purchase_price' => $this->purchase_price,
+                'current_value' => $this->purchase_price,
+                'purchase_date' => $this->purchase_date ?: null,
+                'warranty_end_date' => $this->warranty_end_date ?: null,
+                'status' => $this->status,
+                'condition' => $this->condition,
+                'notes' => $this->notes,
+            ]);
 
-        // Upload documents
-        if (!empty($this->documents)) {
-            foreach ($this->documents as $document) {
-                $path = $document->store('asset-documents', 'public');
+            Log::info('Asset created', ['id' => $asset->id]);
 
-                AssetDocument::create([
-                    'asset_id' => $asset->id,
-                    'title' => $document->getClientOriginalName(),
-                    'type' => 'other',
-                    'file_path' => $path,
-                    'file_name' => $document->getClientOriginalName(),
-                    'mime_type' => $document->getMimeType(),
-                    'file_size' => $document->getSize(),
-                    'uploaded_by' => Auth::id(),
-                ]);
+            // ================= UPLOAD FILE =================
+            if (!empty($this->documents)) {
+                foreach ($this->documents as $file) {
+
+                    $path = $file->store('asset-documents', 'public');
+
+                    AssetDocument::create([
+                        'asset_id' => $asset->id,
+                        'title' => $file->getClientOriginalName(),
+                        'type' => 'other',
+                        'file_path' => $path,
+                        'file_name' => $file->getClientOriginalName(),
+                        'mime_type' => $file->getMimeType(),
+                        'file_size' => $file->getSize(),
+                        'uploaded_by' => Auth::id(),
+                    ]);
+                }
             }
+
+        } catch (\Exception $e) {
+            Log::error('Asset creation failed: ' . $e->getMessage());
+            session()->flash('error', 'Gagal menyimpan aset');
+            return;
         }
 
-        session()->flash('message', 'Aset berhasil ditambahkan!');
+        // RESET
+        $this->reset(['documents', 'documentPreviews']);
 
-        return $this->redirect(route('assets.index'), navigate: true);
+        session()->flash('message', 'Aset berhasil ditambahkan');
+
+        return redirect()->route('assets.index');
     }
 
     public function render()
@@ -142,6 +184,6 @@ class AssetCreate extends Component
             'categories' => Category::orderBy('name')->get(),
             'locations' => Location::orderBy('name')->get(),
             'vendors' => Vendor::orderBy('name')->get(),
-        ])->layout('layouts.app');
+        ]);
     }
 }

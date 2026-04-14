@@ -124,19 +124,21 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div class="flex items-center justify-end gap-2">
+                                @can('approve-movements')
                                 @if($movement->status === 'pending')
-                                    <button wire:click="approveMovement({{ $movement->id }})" 
+                                    <button wire:click="approveMovement({{ $movement->id }})"
                                         class="px-3 py-1.5 bg-green-100 text-green-700 hover:bg-green-200 rounded-lg transition-colors font-medium text-xs">
                                         ✓ Approve
                                     </button>
-                                    <button wire:click="rejectMovement({{ $movement->id }})" 
+                                    <button wire:click="rejectMovement({{ $movement->id }})"
                                         class="px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors font-medium text-xs">
                                         ✗ Reject
                                     </button>
                                 @endif
-                                
+                                @endcan
+
                                 @if($movement->type === 'peminjaman' && $movement->status === 'approved' && !$movement->actual_return_date)
-                                    <button wire:click="openReturnModal({{ $movement->id }})" 
+                                    <button wire:click="openReturnModal({{ $movement->id }})"
                                         class="px-3 py-1.5 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg transition-colors font-medium text-xs">
                                         Kembalikan
                                     </button>

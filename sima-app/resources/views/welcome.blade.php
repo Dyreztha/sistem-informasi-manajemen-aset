@@ -19,10 +19,10 @@
 
         </style>
     </head>
-    <body class="antialiased bg-gray-50">
+    <body  x-data="{ clicked: false }" class="antialiased bg-gray-50">
         <div class="min-h-screen">
             <!-- Navigation -->
-            <nav class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 animate-fadeinUpper">
+            <nav :class="clicked ? 'animate-fadeoutupperwelcome' : ''" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 animate-fadeinUpper">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between items-center h-16">
                         <div class="flex items-center">
@@ -37,13 +37,13 @@
             </nav>
 
             <!-- Hero Section -->
-            <div class="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 overflow-hidden">
+            <div :class="clicked ? 'animate-fadeoutupperwelcome' : ''" class="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 overflow-hidden">
 
                 <div class="absolute top-20 left-10 w-96 h-96 bg-blue-300/40 rounded-full blur-3xl"></div>
                 <div class="absolute top-40 right-10 w-96 h-96 bg-purple-300/40 rounded-full blur-3xl"></div>
                 <div class="absolute bottom-20 left-1/3 w-96 h-96 bg-pink-300/30 rounded-full blur-3xl"></div>
 
-                <div class="relative max-w-7xl mx-auto text-center animate-fadeinUpper">
+                <div :class="clicked ? 'animate-fadeoutupperwelcome' : ''" class="relative max-w-7xl mx-auto text-center animate-fadeinUpper">
                     <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-6">
                         Sistem Informasi<br>
                         <span class="text-blue-600">Manajemen Aset</span>
@@ -52,7 +52,9 @@
                         Kelola aset perusahaan Anda dengan mudah, efisien, dan terstruktur. Pantau inventaris, lacak pergerakan, dan optimalkan nilai aset dalam satu platform terintegrasi.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                        <a href="{{ route('login') }}" class="px-8 py-4 bg-blue-600 hover:bg-blue-700 hover:scale-110 text-white rounded-xl font-semibold shadow-sm transition-transform duration-[0.4s]">
+                        <a href="{{ route('login') }}"
+                           @click.prevent="clicked = true; setTimeout(() => window.location.href = $el.href, 10)"
+                         class=" px-8 py-4 bg-blue-600 hover:bg-blue-700 sm:hover:scale-110 text-white rounded-xl font-semibold shadow-sm sm:transition-transform sm:duration-[0.4s] active:animate-fadeoutupperwelcome ">
                             Mulai Sekarang
                         </a>
                     </div>
@@ -60,7 +62,7 @@
             </div>
 
             <!-- Features Section -->
-            <div id="features" class="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50 animate-fadeinLower">
+            <div  :class="clicked ? 'animate-fadeoutlowerwelcome' : ''" id="features" class="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50 animate-fadeinLower">
                 <div class="max-w-7xl mx-auto">
                     <div class="text-center mb-16">
                         <h2 class="text-3xl font-bold text-gray-900 mb-4">Fitur Unggulan</h2>

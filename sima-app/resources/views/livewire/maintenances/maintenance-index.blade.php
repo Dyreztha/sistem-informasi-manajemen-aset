@@ -130,16 +130,20 @@
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div class="flex items-center justify-end gap-2">
                                 @can('manage-maintenances')
-                                <button wire:click="openUpdateModal({{ $maintenance->id }})" 
-                                    class="text-blue-600 hover:text-blue-700 transition-colors font-medium">
-                                    Update
+                                <button wire:click="openUpdateModal({{ $maintenance->id }})"
+                                  class="p-2 rounded-lg text-gray-500 hover:text-amber-600 hover:bg-gray-100 transition-colors hover:translate-y-[-1px]">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                    </svg>
                                 </button>
                                 @endcan
                                 @can('manage-maintenances')
-                                <button wire:click="delete({{ $maintenance->id }})" 
-                                    wire:confirm="Apakah Anda yakin ingin menghapus tiket ini?"
-                                    class="text-red-600 hover:text-red-700 transition-colors font-medium">
-                                    Hapus
+                                <button wire:click="confirmDelete({{ $maintenance->id }})"
+
+                                  class="p-2 rounded-lg text-gray-500 hover:text-red-600 hover:bg-gray-100 transition-colors hover:translate-y-[-1px]">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                    </svg>
                                 </button>
                                 @endcan
                             </div>
@@ -194,7 +198,7 @@
                                 @default {{ ucfirst($selectedMaintenance->type) }}
                             @endswitch
                         </span></p>
-                        <p class="text-sm text-gray-600">Status Saat Ini: 
+                        <p class="text-sm text-gray-600">Status Saat Ini:
                             <span class="font-semibold px-2 py-0.5 rounded text-xs
                                 @switch($selectedMaintenance->status)
                                     @case('pending') bg-yellow-100 text-yellow-700 @break
@@ -270,6 +274,35 @@
                     <button wire:click="updateMaintenance"
                         class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-sm transition-all duration-300">
                         Update Status
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+        <!-- Delete Confirmation Modal -->
+    @if($showDeleteModal)
+    <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-6 border border-gray-200 w-full max-w-sm shadow-xl rounded-2xl bg-white">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-red-100">
+                    <svg class="h-7 w-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mt-4">Hapus Pemeliharaan?</h3>
+                <p class="text-sm text-gray-500 mt-2">
+                    Apakah Anda yakin ingin menghapus pemeliharaan ini? Tindakan ini tidak dapat dibatalkan.
+                </p>
+                <div class="mt-6 flex justify-center gap-3">
+                    <button wire:click="$set('showDeleteModal', false)"
+                        class="px-5 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-xl font-medium transition-colors">
+                        Batal
+                    </button>
+                    <button wire:click="delete"
+                        class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition-colors">
+                        Hapus
                     </button>
                 </div>
             </div>

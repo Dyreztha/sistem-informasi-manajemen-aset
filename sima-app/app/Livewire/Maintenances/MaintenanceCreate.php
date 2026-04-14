@@ -2,12 +2,14 @@
 
 namespace App\Livewire\Maintenances;
 
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use App\Models\Asset;
 use App\Models\Maintenance;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
+#[Layout('layouts.app')]
 class MaintenanceCreate extends Component
 {
     public $asset_id = '';
@@ -142,6 +144,6 @@ class MaintenanceCreate extends Component
         return view('livewire.maintenances.maintenance-create', [
             'assets' => $assets,
             'technicians' => $technicians,
-        ])->layout('layouts.app');
+        ]);
     }
 }

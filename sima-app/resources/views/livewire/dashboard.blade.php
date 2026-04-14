@@ -1,4 +1,4 @@
-<div class="animate-fadeinDashboardAdmin">
+<div class="">
     <!-- Welcome Section -->
     <div class="mb-8 ">
         <h1 class="text-2xl font-bold text-gray-900 mb-2">Selamat Datang, {{ auth()->user()->name }}!</h1>

@@ -33,37 +33,37 @@ new class extends Component
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    
+
                     @can('view-assets')
                     <x-nav-link :href="route('assets.index')" :active="request()->routeIs('assets.*')" wire:navigate>
                         {{ __('Aset') }}
                     </x-nav-link>
                     @endcan
-                    
+
                     @can('view-categories')
                     <x-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')" wire:navigate>
                         {{ __('Kategori') }}
                     </x-nav-link>
                     @endcan
-                    
+
                     @can('view-locations')
                     <x-nav-link :href="route('locations.index')" :active="request()->routeIs('locations.*')" wire:navigate>
                         {{ __('Lokasi') }}
                     </x-nav-link>
                     @endcan
-                    
+
                     @can('view-movements')
                     <x-nav-link :href="route('movements.index')" :active="request()->routeIs('movements.*')" wire:navigate>
                         {{ __('Sirkulasi') }}
                     </x-nav-link>
                     @endcan
-                    
+
                     @can('view-maintenances')
                     <x-nav-link :href="route('maintenances.index')" :active="request()->routeIs('maintenances.*')" wire:navigate>
                         {{ __('Pemeliharaan') }}
                     </x-nav-link>
                     @endcan
-                    
+
                     @can('view-stock-opnames')
                     <x-nav-link :href="route('stock-opnames.index')" :active="request()->routeIs('stock-opnames.*')" wire:navigate>
                         {{ __('Stock Opname') }}
@@ -120,37 +120,37 @@ new class extends Component
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            
+
             @can('view-assets')
             <x-responsive-nav-link :href="route('assets.index')" :active="request()->routeIs('assets.*')" wire:navigate>
                 {{ __('Aset') }}
             </x-responsive-nav-link>
             @endcan
-            
+
             @can('view-categories')
             <x-responsive-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')" wire:navigate>
                 {{ __('Kategori') }}
             </x-responsive-nav-link>
             @endcan
-            
+
             @can('view-locations')
             <x-responsive-nav-link :href="route('locations.index')" :active="request()->routeIs('locations.*')" wire:navigate>
                 {{ __('Lokasi') }}
             </x-responsive-nav-link>
             @endcan
-            
+
             @can('view-movements')
             <x-responsive-nav-link :href="route('movements.index')" :active="request()->routeIs('movements.*')" wire:navigate>
                 {{ __('Sirkulasi') }}
             </x-responsive-nav-link>
             @endcan
-            
+
             @can('view-maintenances')
             <x-responsive-nav-link :href="route('maintenances.index')" :active="request()->routeIs('maintenances.*')" wire:navigate>
                 {{ __('Pemeliharaan') }}
             </x-responsive-nav-link>
             @endcan
-            
+
             @can('view-stock-opnames')
             <x-responsive-nav-link :href="route('stock-opnames.index')" :active="request()->routeIs('stock-opnames.*')" wire:navigate>
                 {{ __('Stock Opname') }}

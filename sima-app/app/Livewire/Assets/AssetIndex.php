@@ -2,11 +2,14 @@
 
 namespace App\Livewire\Assets;
 
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Asset;
 use App\Models\Category;
 use App\Models\Location;
+
+#[Layout('layouts.app')]
 
 class AssetIndex extends Component
 {
@@ -93,6 +96,6 @@ class AssetIndex extends Component
             'assets' => $assets,
             'categories' => Category::all(),
             'locations' => Location::all(),
-        ])->layout('layouts.app', ['header' => 'Daftar Aset']);
+        ]);
     }
 }

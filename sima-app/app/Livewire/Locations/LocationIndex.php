@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Locations;
 
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Location;
 
+#[Layout('layouts.app')]
 class LocationIndex extends Component
 {
     use WithPagination;
@@ -143,6 +145,6 @@ class LocationIndex extends Component
         return view('livewire.locations.location-index', [
             'locations' => $locations,
             'parentLocations' => $parentLocations,
-        ])->layout('layouts.app');
+        ]);
     }
 }

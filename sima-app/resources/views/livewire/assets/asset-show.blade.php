@@ -2,7 +2,7 @@
     <x-slot name="header">
         Detail Aset: {{ $asset->code }}
     </x-slot>
-    
+
     <!-- Header Actions -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
         <div class="flex items-center">
@@ -17,16 +17,20 @@
             </div>
         </div>
         @can('edit-assets')
-        <a href="{{ route('assets.edit', $asset) }}" wire:navigate 
-           class="mt-4 sm:mt-0 inline-flex items-center px-4 py-2.5 bg-amber-500 hover:bg-amber-600 rounded-xl font-semibold text-sm text-white shadow-sm transition-all">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-            </svg>
-            Edit
-        </a>
+        <div class="flex gap-2">
+            <a href="{{ route('assets.edit', $asset) }}" wire:navigate
+               class="mt-4 sm:mt-0 inline-flex items-center px-4 py-2.5 bg-amber-500 hover:bg-amber-600 rounded-xl font-semibold text-sm text-white shadow-sm transition-all">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+                Edit
+            </a>
+         
+
+        </div>
         @endcan
     </div>
-    
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Left Column - Main Info -->
         <div class="lg:col-span-2 space-y-6">
@@ -68,7 +72,7 @@
                     </div>
                 </div>
             </div>
-                    
+
             <!-- Informasi Keuangan -->
             <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-200">Informasi Keuangan</h3>
@@ -98,7 +102,7 @@
                 </div>
                 @endif
             </div>
-                    
+
             <!-- Status & Kondisi -->
             <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-200">Status & Kondisi</h3>
@@ -146,7 +150,7 @@
                     </div>
                 </div>
             </div>
-                    
+
             <!-- Deskripsi & Catatan -->
             @if($asset->description || $asset->notes)
             <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
@@ -165,7 +169,7 @@
                 @endif
             </div>
             @endif
-                    
+
             <!-- Riwayat Mutasi -->
             <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-200">Riwayat Pergerakan</h3>
@@ -188,7 +192,7 @@
                 @endif
             </div>
         </div>
-                
+
         <!-- Right Column - QR Code & Documents -->
         <div class="space-y-6">
             <!-- QR Code -->
@@ -206,9 +210,10 @@
                         </svg>
                         Cetak Label
                     </button>
+
                 </div>
             </div>
-                    
+
             <!-- Documents -->
             <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-200">Dokumen</h3>
@@ -230,7 +235,7 @@
                 <p class="text-gray-500 text-center py-4">Tidak ada dokumen</p>
                 @endif
             </div>
-                    
+
             <!-- Maintenance History -->
             <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-200">Riwayat Pemeliharaan</h3>

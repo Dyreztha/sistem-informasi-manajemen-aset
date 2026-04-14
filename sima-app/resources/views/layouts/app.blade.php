@@ -32,7 +32,7 @@
                    :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
 
                 <!-- Logo -->
-                <div class="flex items-center h-16 px-6 border-b border-gray-200">
+                <div class="flex items-center h-16 px-6 border-b border-gray-200 ">
                     <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center space-x-3">
                         <img src="{{ asset('media/images/sima-icon.png') }}" alt="SIMA" class="h-8 w-8">
                         <span class="text-xl font-bold text-gray-900">SIMA</span>
@@ -40,7 +40,7 @@
                 </div>
 
                 <!-- Navigation -->
-                <nav class="p-4 space-y-1 overflow-y-auto" style="height: calc(100vh - 140px);">
+                <nav class="p-4 space-y-1 overflow-y-auto " style="height: calc(100vh - 140px);">
                     <a href="{{ route('dashboard') }}" wire:navigate
                        class="sidebar-link flex items-center px-3 py-2.5 text-sm font-medium rounded-lg {{ request()->routeIs('dashboard') ? 'active' : 'text-gray-700' }}">
                         <svg class="w-5 h-5 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -141,7 +141,7 @@
             </aside>
 
             <!-- Main Content -->
-            <div class="flex-1 lg:ml-64">
+            <div class="flex-1 lg:ml-64 ">
                 <!-- Header -->
                 <header class="sticky top-0 z-20 bg-white border-b border-gray-200">
                     <div class="flex items-center justify-between h-16 px-4 lg:px-8">

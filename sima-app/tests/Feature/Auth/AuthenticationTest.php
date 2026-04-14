@@ -22,6 +22,7 @@ class AuthenticationTest extends TestCase
 
     public function test_users_can_authenticate_using_the_login_screen(): void
     {
+        /** @var User $user */
         $user = User::factory()->create();
 
         $component = Volt::test('pages.auth.login')
@@ -39,6 +40,7 @@ class AuthenticationTest extends TestCase
 
     public function test_users_can_not_authenticate_with_invalid_password(): void
     {
+        /** @var User $user */
         $user = User::factory()->create();
 
         $component = Volt::test('pages.auth.login')
@@ -56,7 +58,8 @@ class AuthenticationTest extends TestCase
 
     public function test_navigation_menu_can_be_rendered(): void
     {
-        $user = User::factory()->create();
+        /** @var User $user */
+        $user = User::factory()->createOne();
 
         $this->actingAs($user);
 
@@ -67,9 +70,11 @@ class AuthenticationTest extends TestCase
             ->assertSeeVolt('layout.navigation');
     }
 
+
     public function test_users_can_logout(): void
     {
-        $user = User::factory()->create();
+        /** @var User $user */
+        $user = User::factory()->createOne();
 
         $this->actingAs($user);
 

@@ -1,4 +1,4 @@
-n# SIMA – Sistem Informasi Manajemen Aset
+## SIMA – Sistem Informasi Manajemen Aset
 
 ## Persyaratan
 - PHP 8.2+

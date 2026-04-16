@@ -35,9 +35,6 @@ Gunakan akun berikut setelah seeding:
 - Manager: manager@sima.com / password
 - Staff: staff@sima.com / password
 - Auditor: auditor@sima.com / password
-<<<<<<< HEAD
 - staff : budi@sima.com /password
 
 http://127.0.0.1:8000/login
-=======
->>>>>>> 6ee1d385f2ae43d9bf8009c951d3a2e16a628d57
